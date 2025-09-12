@@ -1,0 +1,276 @@
+# =============================================================================
+# TOPOLOGY KNOWLEDGE - GIT IGNORE
+# =============================================================================
+# This file ensures only relevant project files are tracked in git
+# while excluding temporary files, logs, secrets, and environment-specific data
+# =============================================================================
+
+# =============================================================================
+# SECRETS & ENVIRONMENT
+# =============================================================================
+.env
+.env.local
+.env.*.local
+.webui_secret_key
+*.key
+*.pem
+*.crt
+*.p12
+api_keys.txt
+secrets/
+credentials/
+
+# Environment-specific configurations
+.env.production
+.env.development
+.env.staging
+
+# =============================================================================
+# PYTHON VIRTUAL ENVIRONMENTS
+# =============================================================================
+openwebui_venv/
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# =============================================================================
+# LOGS & TEMPORARY FILES
+# =============================================================================
+*.log
+logs/
+*.pid
+.topology_pids
+demo.log
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# =============================================================================
+# CONTAINER & DOCKER
+# =============================================================================
+# Keep docker-compose files but ignore runtime data
+docker-data/
+docker-volumes/
+.docker/
+
+# Container logs and temporary files
+*.container.log
+docker-compose.override.yml
+
+# =============================================================================
+# DATABASES & INDEXES
+# =============================================================================
+# Exclude actual data but keep structure
+*.db
+*.sqlite
+*.sqlite3
+indexes/data/
+indexes/cache/
+corebackend/indexes/data/
+corebackend/indexes/cache/
+
+# Vector database data
+qdrant_data/
+chromadb_data/
+faiss_data/
+
+# =============================================================================
+# OLLAMA & MODEL DATA
+# =============================================================================
+# Ollama model files are large and environment-specific
+models/
+*.bin
+*.gguf
+*.safetensors
+ollama_data/
+
+# =============================================================================
+# NODE.JS & FRONTEND (OpenWebUI)
+# =============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+*.tsbuildinfo
+
+# Testing
+coverage/
+*.lcov
+.nyc_output
+
+# =============================================================================
+# IDE & EDITOR FILES
+# =============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+
+# Vim
+*.swp
+*.swo
+Session.vim
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# =============================================================================
+# BACKUP & CACHE FILES
+# =============================================================================
+*.bak
+*.backup
+*.cache
+.cache/
+*.orig
+*.rej
+
+# =============================================================================
+# KNOWLEDGE BASE DATA
+# =============================================================================
+# Exclude large knowledge base files but keep structure
+txts/large_datasets/
+txts/downloads/
+txts/cache/
+
+# Exclude user-uploaded documents (but keep samples)
+uploads/
+user_data/
+documents/private/
+
+# =============================================================================
+# GITHUB & GIT
+# =============================================================================
+# Exclude repository clones but keep configuration
+repos/
+cloned_repos/
+github_cache/
+
+# Keep github_sources.yml (configuration) but exclude downloaded data
+
+# =============================================================================
+# TESTING & DEVELOPMENT
+# =============================================================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# =============================================================================
+# SYSTEM & RUNTIME
+# =============================================================================
+# Process IDs
+*.pid
+.topology_pids
+
+# Core dumps
+core.*
+
+# macOS
+.AppleDouble
+.LSOverride
+Icon?
+
+# Linux
+.directory
+
+# Windows
+desktop.ini
+
+# =============================================================================
+# DOCUMENTATION BUILD
+# =============================================================================
+# Keep source docs but exclude generated documentation
+docs/_build/
+docs/build/
+site/
+
+# =============================================================================
+# WHAT TO KEEP (COMMENTS FOR CLARITY)
+# =============================================================================
+# ✅ Core startup scripts (start.sh, start_server_mode.sh, start_docker_mode.sh)
+# ✅ Configuration files (docker-compose.yml, requirements.txt)
+# ✅ Documentation (README.md, docs/*.md)
+# ✅ Source code (corebackend/, openwebuibase/ - structure)
+# ✅ Sample data and configuration templates
+# ✅ Scripts and utilities
+# ✅ GitHub sources configuration (github_sources.yml)
+# ✅ Knowledge base structure (knowledge_base.json)
+
+# =============================================================================
+# PROJECT-SPECIFIC EXCLUSIONS
+# =============================================================================
+# Exclude large language model files
+*.model
+*.pkl
+*.joblib
+
+# Exclude user-specific customizations
+custom_functions/user_*.py
+user_configs/
+
+# Exclude deployment-specific files
+deployment.env
+production.yml
+staging.yml

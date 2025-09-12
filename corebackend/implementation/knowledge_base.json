@@ -1,0 +1,200 @@
+{
+  "cases": [
+    {
+      "id": "case_001",
+      "title": "Topology Merge Service Timeout",
+      "description": "Service experiencing timeout errors after 30 seconds, high Kafka consumer lag detected",
+      "affected_services": [
+        "topology-merge",
+        "kafka"
+      ],
+      "symptoms": [
+        "timeout",
+        "30 seconds",
+        "slow response",
+        "kafka lag"
+      ],
+      "resolution_steps": [
+        "Check Kafka consumer lag metrics",
+        "Monitor partition assignments",
+        "Scale consumer instances",
+        "Verify network connectivity"
+      ],
+      "confidence": 0.95,
+      "created_at": "2025-08-21T22:59:46.412938",
+      "updated_at": "2025-08-21T22:59:46.412950"
+    },
+    {
+      "id": "case_002",
+      "title": "Cassandra Connection Issues",
+      "description": "Database connection timeouts causing service failures, high read latency observed",
+      "affected_services": [
+        "topology-inventory",
+        "cassandra"
+      ],
+      "symptoms": [
+        "connection timeout",
+        "database",
+        "cassandra",
+        "high latency"
+      ],
+      "resolution_steps": [
+        "Check Cassandra cluster health",
+        "Monitor node performance",
+        "Review connection pool settings",
+        "Restart problematic nodes"
+      ],
+      "confidence": 0.9,
+      "created_at": "2025-08-21T22:59:46.413239",
+      "updated_at": "2025-08-21T22:59:46.413241"
+    },
+    {
+      "id": "case_003",
+      "title": "Redis Cache Performance",
+      "description": "Cache misses and connection timeouts affecting status updates",
+      "affected_services": [
+        "topology-status",
+        "redis"
+      ],
+      "symptoms": [
+        "cache miss",
+        "redis",
+        "stale data",
+        "connection timeout"
+      ],
+      "resolution_steps": [
+        "Monitor Redis memory usage",
+        "Check cache hit ratios",
+        "Scale Redis cluster",
+        "Review eviction policies"
+      ],
+      "confidence": 0.85,
+      "created_at": "2025-08-21T22:59:46.413348",
+      "updated_at": "2025-08-21T22:59:46.413349"
+    },
+    {
+      "id": "case_004",
+      "title": "Memory Leak in Microservice",
+      "description": "Gradual memory increase leading to OOM kills and service restarts",
+      "affected_services": [
+        "topology-inventory"
+      ],
+      "symptoms": [
+        "memory leak",
+        "out of memory",
+        "oom",
+        "restart",
+        "gradual increase"
+      ],
+      "resolution_steps": [
+        "Monitor heap dump analysis",
+        "Check garbage collection metrics",
+        "Review application logs",
+        "Update memory limits"
+      ],
+      "confidence": 0.8,
+      "created_at": "2025-08-21T22:59:46.413461",
+      "updated_at": "2025-08-21T22:59:46.413462"
+    },
+    {
+      "id": "case_001",
+      "title": "Topology Merge Service Timeout",
+      "description": "Service experiencing timeout errors after 30 seconds, high Kafka consumer lag detected",
+      "affected_services": [
+        "topology-merge",
+        "kafka"
+      ],
+      "symptoms": [
+        "timeout",
+        "30 seconds",
+        "slow response",
+        "kafka lag"
+      ],
+      "resolution_steps": [
+        "Check Kafka consumer lag metrics",
+        "Monitor partition assignments",
+        "Scale consumer instances",
+        "Verify network connectivity"
+      ],
+      "confidence": 0.95,
+      "created_at": "2025-08-21T23:01:15.015112",
+      "updated_at": "2025-08-21T23:01:15.015122"
+    },
+    {
+      "id": "case_002",
+      "title": "Cassandra Connection Issues",
+      "description": "Database connection timeouts causing service failures, high read latency observed",
+      "affected_services": [
+        "topology-inventory",
+        "cassandra"
+      ],
+      "symptoms": [
+        "connection timeout",
+        "database",
+        "cassandra",
+        "high latency"
+      ],
+      "resolution_steps": [
+        "Check Cassandra cluster health",
+        "Monitor node performance",
+        "Review connection pool settings",
+        "Restart problematic nodes"
+      ],
+      "confidence": 0.9,
+      "created_at": "2025-08-21T23:01:15.015330",
+      "updated_at": "2025-08-21T23:01:15.015332"
+    },
+    {
+      "id": "case_003",
+      "title": "Redis Cache Performance",
+      "description": "Cache misses and connection timeouts affecting status updates",
+      "affected_services": [
+        "topology-status",
+        "redis"
+      ],
+      "symptoms": [
+        "cache miss",
+        "redis",
+        "stale data",
+        "connection timeout"
+      ],
+      "resolution_steps": [
+        "Monitor Redis memory usage",
+        "Check cache hit ratios",
+        "Scale Redis cluster",
+        "Review eviction policies"
+      ],
+      "confidence": 0.85,
+      "created_at": "2025-08-21T23:01:15.015535",
+      "updated_at": "2025-08-21T23:01:15.015536"
+    },
+    {
+      "id": "case_004",
+      "title": "Memory Leak in Microservice",
+      "description": "Gradual memory increase leading to OOM kills and service restarts",
+      "affected_services": [
+        "topology-inventory"
+      ],
+      "symptoms": [
+        "memory leak",
+        "out of memory",
+        "oom",
+        "restart",
+        "gradual increase"
+      ],
+      "resolution_steps": [
+        "Monitor heap dump analysis",
+        "Check garbage collection metrics",
+        "Review application logs",
+        "Update memory limits"
+      ],
+      "confidence": 0.8,
+      "created_at": "2025-08-21T23:01:15.015757",
+      "updated_at": "2025-08-21T23:01:15.015759"
+    }
+  ],
+  "metadata": {
+    "last_updated": "2025-08-21T23:01:15.015794",
+    "total_cases": 8
+  }
+}

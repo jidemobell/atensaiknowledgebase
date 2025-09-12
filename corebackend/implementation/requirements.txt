@@ -1,0 +1,29 @@
+# Enhanced AI-Powered Support System - Requirements
+# Core FastAPI and web framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+
+# Data processing and validation
+pydantic==2.5.0
+python-dateutil==2.8.2
+
+# Optional AI/ML dependencies
+sentence-transformers==2.2.2
+transformers==4.35.2
+torch==2.1.1
+
+# Vector database (optional)
+qdrant-client==1.6.9
+
+# Document processing (optional)
+tiktoken==0.5.1
+unstructured==0.11.2
+
+# Development and testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+
+# Utilities
+python-dotenv==1.0.0

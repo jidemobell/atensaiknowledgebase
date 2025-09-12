@@ -1,0 +1,201 @@
+# GitHub Project Sources Configuration
+# External codebases to integrate for knowledge synthesis
+
+# AUTHENTICATION REQUIREMENTS:
+# - Public repositories: No authentication needed
+# - Private repositories: Requires GitHub Personal Access Token (PAT)
+# - Organization repositories: May require organization membership + PAT
+
+github_sources:
+  # IBM Research & Enterprise Projects
+  ibm_research:
+    repositories:
+      # Example IBM Research repositories
+      - url: "https://github.com/IBM/your-ai-project"
+        focus: "aiops_patterns" 
+        extraction_method: "code_analysis"
+        auth_required: true    # Private repository
+        description: "IBM AI Operations patterns and architectures"
+      
+      - url: "https://github.com/IBM/granite-code-models"
+        focus: "code_intelligence"
+        extraction_method: "model_architecture"
+        auth_required: false   # Public repository
+        description: "IBM Granite code models for knowledge synthesis"
+    
+  enterprise_aiops:
+    repositories:
+      # Your enterprise topology and operations repositories
+      - url: "https://github.com/company/topology-service"  
+        focus: "scalability_patterns"
+        extraction_method: "architecture_analysis"
+        auth_required: true    # Private company repository
+        description: "Topology management and scaling patterns"
+      
+      - url: "https://github.com/company/aiops-platform"
+        focus: "operational_intelligence"
+        extraction_method: "ops_pattern_analysis"
+        auth_required: true    # Private company repository
+        description: "AI-driven operations platform"
+    
+  knowledge_management:
+    repositories:
+      # Knowledge representation and management systems
+      - url: "https://github.com/org/knowledge-platform"
+        focus: "knowledge_representation"
+        extraction_method: "algorithmic_analysis"
+        auth_required: true    # Private organization repository
+        description: "Advanced knowledge representation algorithms"
+    
+  ai_research:
+    repositories:
+      # Public AI research repositories for cutting-edge techniques
+      - url: "https://github.com/research/novel-ai"
+        focus: "cutting_edge_techniques" 
+        extraction_method: "research_paper_implementation"
+        auth_required: false   # Public research repository
+        description: "Novel AI research implementations"
+      
+      - url: "https://github.com/huggingface/transformers"
+        focus: "transformer_architectures"
+        extraction_method: "architecture_patterns"
+        auth_required: false   # Public repository
+        description: "State-of-the-art transformer architectures"
+    
+  topology_management:
+    repositories:
+      # Domain-specific topology and network management
+      - url: "https://github.com/team/topology-service"
+        focus: "domain_expertise"
+        extraction_method: "domain_pattern_analysis"
+        auth_required: true    # Private team repository
+        description: "Domain-specific topology management patterns"
+
+# Authentication & Integration Configuration
+auth_config:
+  # GitHub Personal Access Token (required for private repositories)
+  # Generate at: https://github.com/settings/tokens
+  # Required scopes: repo, read:org, read:user
+  github_token: "${GITHUB_TOKEN}"  # Set as environment variable
+  
+  # API rate limiting respect
+  rate_limit_respect: true
+  requests_per_hour: 5000  # GitHub API limit
+  
+  # Caching configuration
+  cache_enabled: true
+  cache_duration: "24h"    # Cache repository data for 24 hours
+  cache_directory: "./cache/github_repos"
+  
+  # Security settings
+  token_rotation_reminder: "90 days"  # Remind to rotate token
+  log_access_attempts: true
+  secure_token_storage: true
+
+# Integration Settings
+integration_settings:
+  extraction_methods:
+    code_analysis:
+      enabled: true
+      depth: "deep"
+      focus_areas: ["algorithms", "patterns", "optimizations", "architecture"]
+      file_types: [".py", ".js", ".ts", ".java", ".cpp", ".go", ".rs"]
+      
+    architecture_analysis:
+      enabled: true
+      depth: "comprehensive"
+      focus_areas: ["system_design", "scalability", "performance", "security"]
+      file_types: [".md", ".yml", ".yaml", ".json", ".toml", ".dockerfile"]
+      
+    research_paper_implementation:
+      enabled: true
+      depth: "deep"
+      focus_areas: ["novel_algorithms", "experimental_results", "benchmarks"]
+      file_types: [".py", ".ipynb", ".md", ".tex"]
+      
+    ops_pattern_analysis:
+      enabled: true
+      depth: "operational"
+      focus_areas: ["monitoring", "logging", "alerting", "automation"]
+      file_types: [".yml", ".yaml", ".sh", ".py", ".md"]
+      
+    domain_pattern_analysis:
+      enabled: true
+      depth: "domain_specific"
+      focus_areas: ["business_logic", "domain_models", "workflows"]
+      file_types: [".py", ".java", ".ts", ".md", ".sql"]
+
+  # Processing configuration
+  processing:
+    max_file_size: "10MB"
+    batch_size: 50
+    parallel_processing: true
+    error_handling: "continue"    # continue, stop, skip
+    
+  # Output configuration
+  output:
+    knowledge_base_integration: true
+    structured_summaries: true
+    pattern_extraction: true
+    code_snippet_examples: true
+
+# Repository Categories for Knowledge Fusion
+repository_categories:
+  high_priority:
+    - "IBM research repositories"
+    - "Enterprise topology services" 
+    - "AI operations platforms"
+    
+  medium_priority:
+    - "Knowledge management systems"
+    - "Public AI research"
+    
+  continuous_monitoring:
+    - "Active development repositories"
+    - "Frequently updated codebases"
+
+# Usage Examples:
+# 1. Public repo (no auth): Set auth_required: false
+# 2. Private repo: Set auth_required: true, ensure GITHUB_TOKEN is set
+# 3. Organization repo: Set auth_required: true, ensure token has org access
+
+# Setup Instructions:
+# 1. Generate GitHub Personal Access Token:
+#    - Go to: https://github.com/settings/tokens
+#    - Select scopes: repo, read:org, read:user
+# 2. Set environment variable:
+#    export GITHUB_TOKEN="your_token_here"
+# 3. Update repository URLs above with your actual repositories
+# 4. Test access: python -c "from knowledge_fusion_init import test_github_access; test_github_access()"
+    
+    architecture_analysis:
+      enabled: true
+      depth: "comprehensive"
+      focus_areas: ["design_patterns", "scalability", "integration"]
+    
+    domain_pattern_analysis:
+      enabled: true
+      depth: "expert"
+      focus_areas: ["business_logic", "workflows", "rules"]
+    
+    research_paper_implementation:
+      enabled: true
+      depth: "cutting_edge"
+      focus_areas: ["novel_algorithms", "innovations", "experiments"]
+    
+    api_analysis:
+      enabled: true
+      depth: "interface_focused"
+      focus_areas: ["protocols", "versioning", "integration_patterns"]
+
+  fusion_strategy:
+    multi_source_synthesis: true
+    temporal_pattern_recognition: true
+    confidence_weighted_integration: true
+    conflict_resolution: "intelligent"
+    
+  output_integration:
+    knowledge_graph_update: true
+    pattern_library_enhancement: true
+    synthesis_model_training: true
+    predictive_insights_generation: true
