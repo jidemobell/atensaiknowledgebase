@@ -1,6 +1,26 @@
 # Topology Knowledge Platform
 *Next-Generation Knowledge Synthesis Beyond Traditional RAG*
 
+## 🚀 Quick Setup
+
+### Repository Cloning
+```bash
+# Clone with submodules (recommended)
+git clone --recursive https://github.com/YOUR_USERNAME/TOPOLOGYKNOWLEDGE.git
+
+# OR clone then initialize submodules
+git clone https://github.com/YOUR_USERNAME/TOPOLOGYKNOWLEDGE.git
+cd TOPOLOGYKNOWLEDGE
+git submodule update --init --recursive
+```
+
+### One-Command Launch
+```bash
+./start.sh
+```
+
+---
+
 ## 🧠 Beyond RAG: Intelligent Knowledge Topology
 
 Unlike traditional RAG systems that simply retrieve and inject documents, the Topology Knowledge Platform represents a fundamental paradigm shift. We've architected an **intelligent knowledge synthesis engine** that understands the topology of information—the complex relationships, dependencies, and contextual connections that exist within and across knowledge domains.
@@ -295,8 +315,11 @@ Create comprehensive overviews:
 
 ### 📋 Operations
 - **[Migration Guide](docs/MIGRATION_GUIDE.md)** - Environment transfer procedures
+- **[Git Submodule Guide](docs/GIT_SUBMODULE_GUIDE.md)** - Managing the OpenWebUI submodule
 - **[SSO Integration](docs/SSO_INTEGRATION_GUIDE.md)** - Enterprise authentication setup
 - **[Startup Guide](docs/STARTUP_GUIDE.md)** - Quick testing and demo procedures
+
+> **🔧 Repository Setup**: This project uses git submodules for OpenWebUI integration. When cloning, use `git clone --recursive` or run `git submodule update --init --recursive` after cloning.
 
 ---
 
