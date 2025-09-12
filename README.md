@@ -4,15 +4,35 @@
 ## 🚀 Quick Setup
 
 ### Repository Cloning
-```bash
-# Clone with submodules (recommended)
-git clone --recursive https://github.com/YOUR_USERNAME/TOPOLOGYKNOWLEDGE.git
 
-# OR clone then initialize submodules
-git clone https://github.com/YOUR_USERNAME/TOPOLOGYKNOWLEDGE.git
-cd TOPOLOGYKNOWLEDGE
+#### For Most Users (Auto-detection)
+```bash
+git clone https://github.com/jidemobell/knowledgebase.git
+cd knowledgebase
+./setup.sh
+```
+
+#### For Enterprise/IBM Environments (HTTPS only)
+```bash
+git clone https://github.com/jidemobell/knowledgebase.git
+cd knowledgebase
+./setup.sh --https
+```
+
+#### For Development Environments (SSH preferred)
+```bash
+git clone git@github.com:jidemobell/knowledgebase.git
+cd knowledgebase
+./setup.sh --ssh
+```
+
+#### Manual Submodule Setup
+```bash
+# If openwebuibase folder is empty after cloning:
 git submodule update --init --recursive
 ```
+
+> **🏢 Enterprise Note**: The setup script automatically detects your environment and uses the appropriate connection method (HTTPS for enterprise, SSH for development).
 
 ### One-Command Launch
 ```bash
