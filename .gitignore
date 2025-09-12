@@ -274,3 +274,62 @@ user_configs/
 deployment.env
 production.yml
 staging.yml
+
+# =============================================================================
+# OPENWEBUI SUBMODULE HANDLING
+# =============================================================================
+# The openwebuibase/ directory is handled as a git submodule
+# Only track our custom modifications within it, not the full repo contents
+
+# Exclude OpenWebUI build artifacts and dependencies
+openwebuibase/node_modules/
+openwebuibase/dist/
+openwebuibase/build/
+openwebuibase/.svelte-kit/
+openwebuibase/.next/
+
+# Exclude OpenWebUI runtime and cache files
+openwebuibase/*.log
+openwebuibase/logs/
+openwebuibase/.cache/
+openwebuibase/.npm/
+openwebuibase/.yarn/
+
+# Exclude OpenWebUI environment files (except our template)
+openwebuibase/.env
+openwebuibase/.env.local
+openwebuibase/.env.*.local
+
+# Exclude OpenWebUI editor and IDE files
+openwebuibase/.vscode/
+openwebuibase/.idea/
+openwebuibase/*.sublime-*
+openwebuibase/*.swp
+openwebuibase/*.swo
+
+# Exclude OpenWebUI test and coverage files
+openwebuibase/coverage/
+openwebuibase/.nyc_output/
+openwebuibase/.pytest_cache/
+openwebuibase/test-results/
+
+# Exclude OpenWebUI database and storage
+openwebuibase/data/
+openwebuibase/uploads/
+openwebuibase/storage/
+openwebuibase/*.db
+openwebuibase/*.sqlite*
+
+# Exclude OpenWebUI system files
+openwebuibase/.DS_Store
+openwebuibase/Thumbs.db
+openwebuibase/._*
+
+# IMPORTANT: Keep our custom Knowledge Fusion integration
+!openwebuibase/knowledge-fusion/
+!openwebuibase/.env.example
+
+# Keep essential OpenWebUI config files we might customize
+!openwebuibase/package.json
+!openwebuibase/docker-compose.yaml
+!openwebuibase/Dockerfile
