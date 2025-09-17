@@ -1,5 +1,36 @@
-# Topology Knowledge Platform
-*Next-Generation Knowledge Synthesis Beyond Traditional RAG*
+# Topology Kn## �🚀 Quick Setup
+
+### Universal Access (Works on Any Computer)
+```bash
+# Clone with HTTPS (no SSH keys needed)
+git clone https://github.com/jidemobell/knowledgebase.git
+cd knowledgebase
+
+# Auto-detects your environment and sets up everything
+./setup.sh
+
+# Start the platform
+./start.sh
+```
+
+### Alternative Setup Methods
+
+#### For Development (SSH if available)
+```bash
+git clone git@github.com:jidemobell/knowledgebase.git
+cd knowledgebase
+./setup.sh --dev
+```
+
+#### For Enterprise/Corporate Environments
+```bash
+git clone https://github.com/jidemobell/knowledgebase.git
+cd knowledgebase
+./setup.sh --enterprise
+```
+
+### 🔧 Having Access Issues?
+See **[Cross-Machine Setup Guide](docs/CROSS_MACHINE_SETUP_GUIDE.md)** for detailed troubleshooting.*Next-Generation Knowledge Synthesis Beyond Traditional RAG*
 
 ## � Complete Documentation
 
@@ -327,8 +358,9 @@ Create comprehensive overviews:
 ## 📚 Documentation Library
 
 ### 🚀 Essential Guides
-- **[Unified Startup Guide](docs/UNIFIED_STARTUP_GUIDE.md)** - Complete deployment instructions
 - **[Complete Setup Guide](docs/COMPLETE_SETUP_GUIDE.md)** - Detailed installation and configuration
+- **[Setup Completion Summary](docs/SETUP_COMPLETION_SUMMARY.md)** - ✅ Current platform status and verification
+- **[Unified Startup Guide](docs/UNIFIED_STARTUP_GUIDE.md)** - Complete deployment instructions
 - **[API Documentation](docs/QWENROUTE_API_DOCUMENTATION.md)** - Complete backend API reference
 - **[IBM Deployment Guide](docs/IBM_DEPLOYMENT_GUIDE.md)** - Enterprise deployment strategies
 
@@ -342,11 +374,15 @@ Create comprehensive overviews:
 - **[Docker Deployment](docs/DOCKER_DEPLOYMENT.md)** - Container orchestration details
 - **[Podman Support](docs/PODMAN_SUPPORT.md)** - Enterprise container runtime compatibility
 - **[OpenWebUI Setup](docs/OPENWEBUI_SETUP.md)** - Frontend configuration
+- **[OpenWebUI Success](docs/OPENWEBUI_SUCCESS.md)** - Installation verification and status
+- **[Core Backend Dependencies Fixed](docs/CORE_BACKEND_DEPENDENCIES_FIXED.md)** - Dependency resolution details
 
 > **🏢 Enterprise Note**: Our containerized mode automatically detects and supports both **Docker** and **Podman**. Perfect for IBM and other enterprise environments where Podman is preferred. The system seamlessly adapts to your container runtime without any configuration changes.
 
 ### 📋 Operations
 - **[Migration Guide](docs/MIGRATION_GUIDE.md)** - Environment transfer procedures
+- **[OpenWebUI Fresh Migration](docs/OPENWEBUI_FRESH_MIGRATION.md)** - Fresh installation migration guide
+- **[Log Monitoring Guide](docs/LOG_MONITORING_GUIDE.md)** - Comprehensive logging and monitoring tools
 - **[Git Submodule Guide](docs/GIT_SUBMODULE_GUIDE.md)** - Managing the OpenWebUI submodule
 - **[SSO Integration](docs/SSO_INTEGRATION_GUIDE.md)** - Enterprise authentication setup
 - **[Startup Guide](docs/STARTUP_GUIDE.md)** - Quick testing and demo procedures
