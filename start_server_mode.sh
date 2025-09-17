@@ -179,17 +179,73 @@ fi
 
 echo -e "${GREEN}✅ All required directories found${NC}"
 
-# Install core backend dependencies if needed (DISABLED: causes version conflicts with OpenWebUI)
-# CORE_BACKEND_REQUIREMENTS="$CORE_BACKEND_PATH/implementation/backend/requirements.txt"
-# if [ -f "$CORE_BACKEND_REQUIREMENTS" ]; then
-#     echo "🔄 Installing core backend dependencies..."
-#     pip install -r "$CORE_BACKEND_REQUIREMENTS" --quiet || {
-#         echo -e "${RED}❌ Failed to install core backend dependencies${NC}"
-#         exit 1
-#     }
-#     echo -e "${GREEN}✅ Core backend dependencies installed${NC}"
-# fi
-echo -e "${GREEN}✅ Core backend dependencies skipped (using OpenWebUI environment)${NC}"
+# Smart Core Backend dependency installation
+echo -e "\n${BLUE}🔄 Checking Core Backend dependencies...${NC}"
+CORE_BACKEND_REQUIREMENTS="$CORE_BACKEND_PATH/implementation/backend/requirements.txt"
+
+if [ -f "$CORE_BACKEND_REQUIREMENTS" ]; then
+    # Create a filtered requirements file that avoids conflicts
+    TEMP_REQUIREMENTS=$(mktemp)
+    
+    echo "# Smart Core Backend Dependencies - avoiding conflicts with OpenWebUI" > "$TEMP_REQUIREMENTS"
+    echo "# Generated automatically by start_server_mode.sh" >> "$TEMP_REQUIREMENTS"
+    echo "" >> "$TEMP_REQUIREMENTS"
+    
+    # Essential packages that don't conflict (use current versions)
+    cat >> "$TEMP_REQUIREMENTS" << 'EOF'
+# Data processing (compatible versions)
+python-dateutil>=2.8.2
+python-multipart>=0.0.6
+
+# AI/ML dependencies (use newer versions for compatibility)
+sentence-transformers>=2.2.2
+transformers>=4.35.2
+
+# Development and testing
+requests>=2.31.0
+httpx>=0.25.2
+
+# Utilities
+python-dotenv>=1.0.0
+EOF
+
+    echo "Installing compatible Core Backend dependencies..."
+    if pip install -r "$TEMP_REQUIREMENTS" --quiet; then
+        echo -e "${GREEN}✅ Core Backend dependencies installed (conflict-safe)${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Some Core Backend dependencies may need manual installation${NC}"
+        echo "You can manually install missing packages if needed"
+    fi
+    
+    # Cleanup
+    rm "$TEMP_REQUIREMENTS"
+    
+    # Check for essential missing packages
+    echo "Checking for essential missing packages..."
+    missing_packages=()
+    
+    # Check for sentence-transformers (critical for AI functionality)
+    if ! python -c "import sentence_transformers" 2>/dev/null; then
+        missing_packages+=("sentence-transformers")
+    fi
+    
+    # Check for python-multipart (needed for file uploads)
+    if ! python -c "import python_multipart" 2>/dev/null; then
+        missing_packages+=("python-multipart")
+    fi
+    
+    if [ ${#missing_packages[@]} -gt 0 ]; then
+        echo -e "${YELLOW}Installing critical missing packages: ${missing_packages[*]}${NC}"
+        pip install "${missing_packages[@]}" --quiet || {
+            echo -e "${YELLOW}⚠️  Some critical packages couldn't be installed automatically${NC}"
+        }
+    fi
+    
+else
+    echo -e "${YELLOW}⚠️  Core Backend requirements.txt not found${NC}"
+fi
+
+echo -e "${GREEN}✅ Core Backend dependency check completed${NC}"
 
 # =============================================================================
 # 2. VERIFY OLLAMA
