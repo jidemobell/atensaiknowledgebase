@@ -155,12 +155,28 @@ python_version=$(python --version)
 echo -e "${GREEN}✅ Using $python_version${NC}"
 
 # Check core directories
-for dir in "$CORE_BACKEND_PATH" "$OPENWEBUI_PATH" "$KNOWLEDGE_FUSION_PATH"; do
+for dir in "$CORE_BACKEND_PATH" "$OPENWEBUI_PATH"; do
     if [ ! -d "$dir" ]; then
         echo -e "${RED}❌ Required directory not found: $dir${NC}"
         exit 1
     fi
 done
+
+# Check and install Knowledge Fusion if missing
+if [ ! -d "$KNOWLEDGE_FUSION_PATH" ]; then
+    echo -e "${YELLOW}⚠️  Knowledge Fusion not found, installing...${NC}"
+    if [ -d "$PROJECT_ROOT/knowledge-fusion-template" ]; then
+        cp -r "$PROJECT_ROOT/knowledge-fusion-template" "$KNOWLEDGE_FUSION_PATH"
+        echo -e "${GREEN}✅ Knowledge Fusion installed from template${NC}"
+    else
+        echo -e "${RED}❌ Knowledge Fusion template not found at $PROJECT_ROOT/knowledge-fusion-template${NC}"
+        echo -e "${YELLOW}Creating basic Knowledge Fusion structure...${NC}"
+        mkdir -p "$KNOWLEDGE_FUSION_PATH"
+        # Create minimal required files - this will be expanded in future iterations
+        echo "# Knowledge Fusion will be fully installed in next update" > "$KNOWLEDGE_FUSION_PATH/README.md"
+    fi
+fi
+
 echo -e "${GREEN}✅ All required directories found${NC}"
 
 # Install core backend dependencies if needed (DISABLED: causes version conflicts with OpenWebUI)

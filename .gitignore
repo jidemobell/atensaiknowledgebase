@@ -354,6 +354,17 @@ openwebuibase/._*
 !openwebuibase/Dockerfile
 
 # =============================================================================
+# KNOWLEDGE FUSION TEMPLATE
+# =============================================================================
+# Keep the template for installation but ignore runtime copies
+!knowledge-fusion-template/
+# But ignore any data generated within the template
+knowledge-fusion-template/logs/
+knowledge-fusion-template/data/
+knowledge-fusion-template/__pycache__/
+knowledge-fusion-template/*.log
+
+# =============================================================================
 # ADDITIONAL EXCLUSIONS FOR DEVELOPMENT
 # =============================================================================
 # Pip cache and temporary installation files
