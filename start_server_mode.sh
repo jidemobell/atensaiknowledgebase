@@ -197,13 +197,17 @@ if [ -f "$CORE_BACKEND_REQUIREMENTS" ]; then
 python-dateutil>=2.8.2
 python-multipart>=0.0.6
 
-# Web framework essentials (required for Knowledge Fusion)
+# Web framework essentials (required for Core Backend and Knowledge Fusion)
 fastapi>=0.104.1
-# Note: uvicorn already installed by OpenWebUI, just ensure compatibility
+uvicorn[standard]>=0.24.0
 
-# AI/ML dependencies (use newer versions for compatibility)
+# AI/ML dependencies (use compatible versions to avoid build issues)
+# Note: tiktoken installed separately to handle version compatibility
 sentence-transformers>=2.2.2
 transformers>=4.35.2
+
+# Compatible huggingface_hub version for sentence-transformers
+huggingface_hub<0.20
 
 # Development and testing
 requests>=2.31.0
@@ -227,13 +231,31 @@ EOF
     # Cleanup
     rm "$TEMP_REQUIREMENTS"
     
-    # Check for essential missing packages
+    # Check for essential missing packages with compatibility fixes
     echo "Checking for essential missing packages..."
     missing_packages=()
     
+    # Check for tiktoken (critical for AI functionality) - use compatible version
+    if ! python -c "import tiktoken" 2>/dev/null; then
+        echo -e "${YELLOW}Installing tiktoken (latest compatible version)...${NC}"
+        # Use latest version that has pre-built wheels to avoid Rust compilation issues
+        pip install tiktoken --no-cache-dir --quiet || {
+            echo -e "${YELLOW}⚠️  tiktoken installation failed - may need manual installation${NC}"
+        }
+    fi
+    
     # Check for sentence-transformers (critical for AI functionality)
     if ! python -c "import sentence_transformers" 2>/dev/null; then
-        missing_packages+=("sentence-transformers")
+        echo -e "${YELLOW}Installing sentence-transformers with compatible dependencies...${NC}"
+        # Install compatible huggingface_hub first to avoid import errors
+        pip install "huggingface_hub<0.20" --quiet 2>/dev/null
+        missing_packages+=("sentence-transformers==2.2.2")
+    else
+        # Check if sentence-transformers can import (compatibility issue check)
+        if ! python -c "import sentence_transformers; print('OK')" 2>/dev/null | grep -q "OK"; then
+            echo -e "${YELLOW}Fixing sentence-transformers compatibility issues...${NC}"
+            pip install "huggingface_hub<0.20" --force-reinstall --quiet 2>/dev/null
+        fi
     fi
     
     # Check for python-multipart (needed for file uploads)
@@ -241,11 +263,40 @@ EOF
         missing_packages+=("python-multipart")
     fi
     
+    # Check for uvicorn (needed for FastAPI)
+    if ! python -c "import uvicorn" 2>/dev/null; then
+        missing_packages+=("uvicorn[standard]")
+    fi
+    
+    # Check for FastAPI (needed for Core Backend)
+    if ! python -c "import fastapi" 2>/dev/null; then
+        missing_packages+=("fastapi")
+    fi
+    
     if [ ${#missing_packages[@]} -gt 0 ]; then
         echo -e "${YELLOW}Installing critical missing packages: ${missing_packages[*]}${NC}"
         pip install "${missing_packages[@]}" --quiet || {
             echo -e "${YELLOW}⚠️  Some critical packages couldn't be installed automatically${NC}"
         }
+    fi
+    
+    # Final compatibility check
+    echo "Performing final compatibility checks..."
+    
+    # Test Core Backend imports
+    if python -c "
+import tiktoken, fastapi, uvicorn
+try:
+    import sentence_transformers
+    print('✅ All Core Backend dependencies verified')
+except ImportError as e:
+    print(f'⚠️  Dependency issue: {e}')
+    exit(1)
+" 2>/dev/null; then
+        echo -e "${GREEN}✅ All Core Backend dependencies are working properly${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Some Core Backend dependencies may have issues${NC}"
+        echo "The platform will still try to start, but some features may not work"
     fi
     
 else
