@@ -34,6 +34,8 @@
    ./start.sh
    # Select option 1: 🖥️ SERVER MODE
    ```
+   
+   **Note**: Knowledge Fusion will be automatically installed on first run if missing.
 
 3. **Access Points**
    - **OpenWebUI Interface**: http://localhost:3000

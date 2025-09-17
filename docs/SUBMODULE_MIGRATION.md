@@ -113,9 +113,9 @@ git submodule update --init --recursive
 ```
 
 ### Knowledge Fusion Missing
-- Knowledge Fusion is now installed at runtime during server startup
-- No longer pre-integrated in the submodule
-- Check `start_server_mode.sh` for installation logic
+- Knowledge Fusion is now **automatically installed** during server startup
+- The system uses `knowledge-fusion-template/` to install when missing
+- No manual setup required - just run `./start.sh` and select SERVER MODE
 
 ### Still Seeing openwebuibase References
 ```bash
