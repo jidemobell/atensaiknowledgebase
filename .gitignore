@@ -108,6 +108,10 @@ corebackend/indexes/cache/
 qdrant_data/
 chromadb_data/
 faiss_data/
+chroma/
+data/chromadb/
+data/vectorstore/
+data/embeddings/
 
 # =============================================================================
 # OLLAMA & MODEL DATA
@@ -275,6 +279,21 @@ deployment.env
 production.yml
 staging.yml
 
+# Exclude cloned repositories used for development/testing
+open-webui-cloned/
+open-webui/
+
+# Exclude temporary fix and setup files
+fix_*.py
+*_temp.py
+temp_*.sh
+
+# Exclude backup files created during updates
+*.backup
+*.old
+*_backup/
+backup_*/
+
 # =============================================================================
 # OPENWEBUI SUBMODULE HANDLING
 # =============================================================================
@@ -333,3 +352,94 @@ openwebuibase/._*
 !openwebuibase/package.json
 !openwebuibase/docker-compose.yaml
 !openwebuibase/Dockerfile
+
+# =============================================================================
+# ADDITIONAL EXCLUSIONS FOR DEVELOPMENT
+# =============================================================================
+# Pip cache and temporary installation files
+pip-log.txt
+pip-delete-this-directory.txt
+.pip-cache/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+htmlcov/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+local_settings.py
+db.sqlite3
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/

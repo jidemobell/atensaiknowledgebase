@@ -1,7 +1,17 @@
 # Topology Knowledge Platform
 *Next-Generation Knowledge Synthesis Beyond Traditional RAG*
 
-## 🚀 Quick Setup
+## � Complete Documentation
+
+### 🎯 **NEW: [Complete User Guide](docs/COMPLETE_USER_GUIDE.md)**
+**Everything you need to know in one place:**
+- **Quick Start**: Get running in minutes
+- **Theory of Design**: Understanding the innovative architecture
+- **Usage Guide**: Practical examples and patterns
+- **Data Population**: How the system learns and evolves
+- **Future Extensions**: Roadmap and possibilities
+
+## �🚀 Quick Setup
 
 ### Repository Cloning
 
@@ -37,6 +47,8 @@ git submodule update --init --recursive
 ### One-Command Launch
 ```bash
 ./start.sh
+# Select option 1: 🖥️ SERVER MODE
+# Access at http://localhost:3000
 ```
 
 ---

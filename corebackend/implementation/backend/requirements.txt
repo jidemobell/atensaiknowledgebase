@@ -1,4 +1,4 @@
-# Core FastAPI dependencies - Python 3.13 compatible
+# Core FastAPI dependencies - Python 3.9+ compatible
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
@@ -7,33 +7,16 @@ python-multipart==0.0.6
 pydantic==2.4.2
 python-dateutil==2.8.2
 
-# Core FastAPI dependencies - Python 3.13 compatible
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-python-multipart==0.0.6
-
-# Data processing and validation - compatible versions
-pydantic==2.4.2
-python-dateutil==2.8.2
-
-# Optional AI/ML dependencies (commented out for now)
-# sentence-transformers==2.2.2
-# transformers==4.35.2
-# torch==2.1.1
-# qdrant-client==1.6.9
-# tiktoken==0.5.1
-# unstructured==0.11.2
+# AI/ML dependencies (required for the backend)
+tiktoken==0.5.1
+sentence-transformers==2.2.2
+transformers==4.35.2
 
 # Development and testing
 requests==2.31.0
-pytest==7.4.3
-httpx==0.25.2
-
-# Development and testing
 pytest==7.4.3
 pytest-asyncio==0.21.1
 httpx==0.25.2
-requests==2.31.0
 
 # Utilities
 python-dotenv==1.0.0
