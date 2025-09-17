@@ -6,7 +6,7 @@
 # This script starts everything in server mode:
 # 1. Core Backend (formerly QwenRoute) 
 # 2. OpenWebUI with Knowledge Fusion integration
-# 3. Verifies Ollama is running
+# 3. Knowledge Fusion services and web server
 # 4. Runs health checks and confirms all systems are operational
 # =============================================================================
 
@@ -197,6 +197,10 @@ if [ -f "$CORE_BACKEND_REQUIREMENTS" ]; then
 python-dateutil>=2.8.2
 python-multipart>=0.0.6
 
+# Web framework essentials (required for Knowledge Fusion)
+fastapi>=0.104.1
+# Note: uvicorn already installed by OpenWebUI, just ensure compatibility
+
 # AI/ML dependencies (use newer versions for compatibility)
 sentence-transformers>=2.2.2
 transformers>=4.35.2
@@ -204,9 +208,12 @@ transformers>=4.35.2
 # Development and testing
 requests>=2.31.0
 httpx>=0.25.2
+aiohttp>=3.9.1
 
 # Utilities
 python-dotenv>=1.0.0
+python-jose>=3.3.0
+passlib>=1.7.4
 EOF
 
     echo "Installing compatible Core Backend dependencies..."
@@ -326,14 +333,44 @@ fi
 
 # Start the Knowledge Fusion web server
 echo "🔄 Starting Knowledge Fusion web server..."
-nohup "$VENV_PATH/bin/python" start_server.py > "$PROJECT_ROOT/logs/knowledge_fusion.log" 2>&1 &
+
+# Verify uvicorn and FastAPI are available (required for Knowledge Fusion server)
+uvicorn_available=true
+if ! "$VENV_PATH/bin/python" -c "import uvicorn, fastapi" 2>/dev/null; then
+    echo -e "  ${YELLOW}⚠️  uvicorn or FastAPI not available, installing for Knowledge Fusion...${NC}"
+    if "$VENV_PATH/bin/pip" install uvicorn fastapi --quiet; then
+        echo -e "  ${GREEN}✅ uvicorn and FastAPI installed successfully${NC}"
+    else
+        echo -e "  ${RED}❌ Failed to install uvicorn/FastAPI for Knowledge Fusion${NC}"
+        echo -e "  ${YELLOW}⚠️  Skipping Knowledge Fusion web server${NC}"
+        uvicorn_available=false
+    fi
+fi
+
+if [ "$uvicorn_available" = true ]; then
+    nohup "$VENV_PATH/bin/python" start_server.py > "$PROJECT_ROOT/logs/knowledge_fusion.log" 2>&1 &
+    KNOWLEDGE_PID=$!
+    echo "KnowledgeFusion $KNOWLEDGE_PID" >> "$PID_FILE"
+    echo -e "  Started Knowledge Fusion web server with PID: $KNOWLEDGE_PID"
+
+    # Wait for Knowledge Fusion to be ready
+    echo "  Waiting for Knowledge Fusion to be ready..."
+    wait_for_service "http://localhost:8002/docs" "Knowledge Fusion" 90
+
+    if [ $? -eq 0 ]; then
+        echo -e "  ${GREEN}✅ Knowledge Fusion web server is ready${NC}"
+    else
+        echo -e "  ${RED}❌ Knowledge Fusion web server failed to start within 180 seconds${NC}"
+        echo -e "  ${YELLOW}⚠️  Continuing without Knowledge Fusion web server${NC}"
+    fi
+fi
 KNOWLEDGE_PID=$!
 echo "KnowledgeFusion $KNOWLEDGE_PID" >> "$PID_FILE"
 echo -e "  Started Knowledge Fusion web server with PID: $KNOWLEDGE_PID"
 
 # Wait for Knowledge Fusion to be ready
 echo "  Waiting for Knowledge Fusion to be ready..."
-wait_for_service "http://localhost:8002/docs" 60
+wait_for_service "http://localhost:8002/docs" "Knowledge Fusion" 90
 
 if [ $? -eq 0 ]; then
     echo -e "  ${GREEN}✅ Knowledge Fusion web server is ready${NC}"
