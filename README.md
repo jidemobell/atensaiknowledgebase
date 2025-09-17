@@ -38,7 +38,7 @@ cd knowledgebase
 
 #### Manual Submodule Setup
 ```bash
-# If openwebuibase folder is empty after cloning:
+# If open-webui-cloned folder is empty after cloning:
 git submodule update --init --recursive
 ```
 

@@ -41,10 +41,10 @@ setup_submodules() {
     # Test SSH access first (preferred for development)
     if test_github_ssh; then
         echo -e "${GREEN}✅ SSH access detected - using SSH URLs${NC}"
-        git config --file .gitmodules submodule.openwebuibase.url "git@github.com:jidemobell/atensai-open-webui.git"
+        git config --file .gitmodules submodule.open-webui-cloned.url "git@github.com:open-webui/open-webui.git"
     elif test_github_https; then
         echo -e "${YELLOW}⚠️  SSH not available - using HTTPS URLs${NC}"
-        git config --file .gitmodules submodule.openwebuibase.url "https://github.com/jidemobell/atensai-open-webui.git"
+        git config --file .gitmodules submodule.open-webui-cloned.url "https://github.com/open-webui/open-webui.git"
     else
         echo -e "${RED}❌ No GitHub access detected${NC}"
         echo "Please check your internet connection and GitHub access"
@@ -65,8 +65,8 @@ setup_submodules() {
 verify_setup() {
     echo -e "\n${BLUE}🔍 Verifying setup...${NC}"
     
-    # Check if openwebuibase has content
-    if [ "$(ls -A openwebuibase/ 2>/dev/null)" ]; then
+    # Check if open-webui-cloned has content
+    if [ "$(ls -A open-webui-cloned/ 2>/dev/null)" ]; then
         echo -e "${GREEN}✅ OpenWebUI submodule populated${NC}"
     else
         echo -e "${RED}❌ OpenWebUI submodule is empty${NC}"
@@ -74,10 +74,10 @@ verify_setup() {
     fi
     
     # Check if Knowledge Fusion exists
-    if [ -d "openwebuibase/knowledge-fusion" ]; then
+    if [ -d "open-webui-cloned/knowledge-fusion" ]; then
         echo -e "${GREEN}✅ Knowledge Fusion integration found${NC}"
     else
-        echo -e "${YELLOW}⚠️  Knowledge Fusion integration not found${NC}"
+        echo -e "${YELLOW}⚠️  Knowledge Fusion integration not found (will be installed during startup)${NC}"
     fi
     
     # Check startup scripts

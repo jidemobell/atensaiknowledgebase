@@ -1,3 +1,3 @@
-[submodule "openwebuibase"]
-	path = openwebuibase
-	url = https://github.com/jidemobell/atensai-open-webui.git
+[submodule "open-webui-cloned"]
+	path = open-webui-cloned
+	url = https://github.com/open-webui/open-webui.git

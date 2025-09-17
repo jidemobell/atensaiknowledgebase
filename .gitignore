@@ -280,7 +280,7 @@ production.yml
 staging.yml
 
 # Exclude cloned repositories used for development/testing
-open-webui-cloned/
+# open-webui-cloned/  # Now handled as submodule
 open-webui/
 
 # Exclude temporary fix and setup files
