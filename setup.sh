@@ -127,23 +127,34 @@ main() {
 case "${1:-}" in
     --ssh)
         echo "Forcing SSH URLs..."
-        git config --file .gitmodules submodule.openwebuibase.url "git@github.com:jidemobell/atensai-open-webui.git"
+        git config --file .gitmodules submodule.open-webui-cloned.url "git@github.com:jidemobell/atensai-open-webui.git"
         git submodule sync
         git submodule update --init --recursive
         ;;
     --https)
         echo "Forcing HTTPS URLs..."
-        git config --file .gitmodules submodule.openwebuibase.url "https://github.com/jidemobell/atensai-open-webui.git"
+        git config --file .gitmodules submodule.open-webui-cloned.url "https://github.com/jidemobell/atensai-open-webui.git"
         git submodule sync
         git submodule update --init --recursive
         ;;
+    --enterprise|--corporate)
+        echo "Configuring for enterprise/corporate environment..."
+        # Force HTTPS for all GitHub URLs globally
+        git config --global url."https://github.com/".insteadOf git@github.com:
+        git config --file .gitmodules submodule.open-webui-cloned.url "https://github.com/jidemobell/atensai-open-webui.git"
+        git submodule sync
+        git submodule update --init --recursive
+        echo "✅ Configured for enterprise environment with HTTPS-only access"
+        ;;
     --help|-h)
-        echo "Usage: $0 [--ssh|--https|--help]"
+        echo "Usage: $0 [--ssh|--https|--enterprise|--help]"
         echo ""
         echo "Options:"
-        echo "  --ssh      Force SSH URLs (for development environments)"
-        echo "  --https    Force HTTPS URLs (for enterprise environments)"
-        echo "  --help     Show this help message"
+        echo "  --ssh          Force SSH URLs (for development environments)"
+        echo "  --https        Force HTTPS URLs (for basic cross-machine compatibility)"
+        echo "  --enterprise   Configure for enterprise/corporate environments"
+        echo "  --corporate    (same as --enterprise)"
+        echo "  --help         Show this help message"
         echo ""
         echo "Without options, automatically detects the best method"
         ;;
