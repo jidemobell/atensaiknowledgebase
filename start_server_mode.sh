@@ -108,13 +108,21 @@ wait_for_service() {
     local max_attempts=${3:-30}  # Default to 30 attempts if not specified
     local attempt=1
     
-    echo "  Waiting for $service_name to be ready..."
+    echo "  Waiting for $service_name to be ready (timeout: $((max_attempts * 2)) seconds)..."
     while [ $attempt -le $max_attempts ]; do
         if curl -s "$url" >/dev/null 2>&1; then
-            echo -e "  ${GREEN}✅ $service_name is ready${NC}"
+            echo -e "\n  ${GREEN}✅ $service_name is ready (took $((attempt * 2)) seconds)${NC}"
             return 0
         fi
-        echo -n "."
+        
+        # Show progress every 30 seconds for long waits
+        if [ $((attempt % 15)) -eq 0 ] && [ $attempt -gt 15 ]; then
+            echo -e "\n  ⏳ Still waiting for $service_name... (${attempt}/${max_attempts} attempts, $((attempt * 2))s elapsed)"
+            echo -n "    "
+        else
+            echo -n "."
+        fi
+        
         sleep 2
         attempt=$((attempt + 1))
     done
@@ -532,8 +540,16 @@ OPENWEBUI_PID=$!
 echo "OpenWebUI $OPENWEBUI_PID" >> "$PID_FILE"
 echo "  Started OpenWebUI with PID: $OPENWEBUI_PID"
 
-if ! wait_for_service "http://localhost:$OPENWEBUI_PORT" "OpenWebUI" 90; then
-    echo -e "${RED}❌ OpenWebUI failed to start${NC}"
+if ! wait_for_service "http://localhost:$OPENWEBUI_PORT" "OpenWebUI" 150; then
+    echo -e "${RED}❌ OpenWebUI failed to start within 5 minutes${NC}"
+    echo -e "${YELLOW}💡 OpenWebUI can take longer on first startup due to:${NC}"
+    echo -e "   • Python package initialization"
+    echo -e "   • Database creation and migration"
+    echo -e "   • Frontend asset compilation"
+    echo -e "   • Vector database setup"
+    echo ""
+    echo -e "${BLUE}🔍 Checking OpenWebUI logs for details:${NC}"
+    tail -20 "$PROJECT_ROOT/logs/openwebui.log" 2>/dev/null || echo "   No logs found"
     cleanup
     exit 1
 fi
