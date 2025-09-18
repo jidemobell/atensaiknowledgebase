@@ -47,6 +47,31 @@ echo "🌐 OpenWebUI: $OPENWEBUI_PATH"
 echo "🧠 Knowledge Fusion: $KNOWLEDGE_FUSION_PATH"
 echo ""
 
+# Pre-flight checks
+echo "🔍 Running pre-flight checks..."
+
+# Check if OpenWebUI directory exists and has content
+if [ ! -d "$OPENWEBUI_PATH" ]; then
+    echo -e "${RED}❌ OpenWebUI directory not found: $OPENWEBUI_PATH${NC}"
+    echo "💡 Please run: git submodule update --init --recursive"
+    echo "   Or for IBM networks: ./setup.sh --ibm"
+    exit 1
+fi
+
+# Check if OpenWebUI has the required files
+if [ ! -f "$OPENWEBUI_PATH/pyproject.toml" ] && [ ! -f "$OPENWEBUI_PATH/setup.py" ]; then
+    echo -e "${RED}❌ OpenWebUI directory exists but is missing project files${NC}"
+    echo "📁 Found in $OPENWEBUI_PATH:"
+    ls -la "$OPENWEBUI_PATH" | head -10
+    echo ""
+    echo "💡 This suggests the git submodule is not properly initialized."
+    echo "   Try: git submodule update --init --recursive"
+    echo "   Or for IBM networks: ./setup.sh --ibm"
+    exit 1
+fi
+
+echo -e "${GREEN}✅ OpenWebUI directory structure verified${NC}"
+
 # Cleanup function for graceful shutdown
 cleanup() {
     echo -e "\n${YELLOW}🛑 Shutting down all services...${NC}"
@@ -442,14 +467,46 @@ echo "🔄 Ensuring OpenWebUI is properly installed..."
 cd "$OPENWEBUI_PATH"
 source "$VENV_PATH/bin/activate"
 
+# Check if this is a valid Python project
+if [ ! -f "pyproject.toml" ] && [ ! -f "setup.py" ]; then
+    echo -e "${RED}❌ OpenWebUI directory is missing project files${NC}"
+    echo "📁 Directory contents:"
+    ls -la
+    echo ""
+    echo "🔧 This might be a submodule issue. Try running:"
+    echo "   git submodule update --init --recursive"
+    echo "   Or use: ./setup.sh --ibm for IBM corporate networks"
+    exit 1
+fi
+
 # Check if open-webui command is available, if not install it
 if ! command -v open-webui >/dev/null 2>&1; then
     echo "🔄 Installing OpenWebUI in development mode..."
-    pip install -e . --quiet || {
-        echo -e "${RED}❌ Failed to install OpenWebUI${NC}"
-        exit 1
-    }
-    echo -e "${GREEN}✅ OpenWebUI installed successfully${NC}"
+    
+    # Try to install with better error handling
+    if pip install -e . --quiet; then
+        echo -e "${GREEN}✅ OpenWebUI installed successfully${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Development install failed, trying package install...${NC}"
+        # Fallback to package install
+        if pip install open-webui --upgrade; then
+            echo -e "${GREEN}✅ OpenWebUI installed via package manager${NC}"
+        else
+            echo -e "${RED}❌ Failed to install OpenWebUI${NC}"
+            echo "🔍 Debugging information:"
+            echo "   Current directory: $(pwd)"
+            echo "   Python version: $(python --version)"
+            echo "   Pip version: $(pip --version)"
+            echo "   Project files:"
+            ls -la *.toml *.py 2>/dev/null || echo "   No project files found"
+            echo ""
+            echo "💡 Suggested solutions:"
+            echo "   1. Try: ./setup.sh --ibm (for corporate networks)"
+            echo "   2. Check if submodule downloaded correctly"
+            echo "   3. Verify internet connectivity"
+            exit 1
+        fi
+    fi
 else
     echo -e "${GREEN}✅ OpenWebUI is already installed${NC}"
 fi
@@ -460,15 +517,17 @@ export VECTOR_DB="chroma"
 mkdir -p "$PROJECT_ROOT/data/chromadb"
 echo "✅ ChromaDB environment configured for compatibility"
 
-# Start OpenWebUI using the proper command from project root
+# Start OpenWebUI using the development installation with frontend
 echo "🔄 Starting OpenWebUI..."
-cd "$PROJECT_ROOT"
+cd "$OPENWEBUI_PATH"
 
-# Ensure we're using the correct Python path
-export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
+# Use the development installation instead of pip-installed version
+export PYTHONPATH="$OPENWEBUI_PATH/backend:$PYTHONPATH"
+export DATA_DIR="$OPENWEBUI_PATH/backend/open_webui/data"
+mkdir -p "$DATA_DIR"
 
-# Start OpenWebUI with the installed executable - use proper working directory
-nohup "$VENV_PATH/bin/open-webui" serve --host 0.0.0.0 --port $OPENWEBUI_PORT > "$PROJECT_ROOT/logs/openwebui.log" 2>&1 &
+# Start OpenWebUI with uvicorn from the development environment
+nohup "$VENV_PATH/bin/python" -m uvicorn open_webui.main:app --host 0.0.0.0 --port $OPENWEBUI_PORT --app-dir backend > "$PROJECT_ROOT/logs/openwebui.log" 2>&1 &
 OPENWEBUI_PID=$!
 echo "OpenWebUI $OPENWEBUI_PID" >> "$PID_FILE"
 echo "  Started OpenWebUI with PID: $OPENWEBUI_PID"
