@@ -2,34 +2,41 @@
 
 ## Installation Summary
 
-✅ **Python 3.11 Virtual Environment**: Successfully created `openwebui_venv` with Python 3.11.11  
-✅ **OpenWebUI Installation**: Successfully installed OpenWebUI v0.6.28 with all dependencies  
+✅ **Python 3.12 Virtual Environment**: Successfully created `openwebui_venv` with Python 3.12.10  
+✅ **OpenWebUI Fresh Installation**: Successfully installed OpenWebUI v0.6.29 (fresh clone with complete frontend)  
+✅ **Data Migration**: All user accounts, uploads, and vector databases preserved from previous installation  
+✅ **Frontend Fixed**: Complete web interface now serving properly (resolved API-only mode issue)  
 ✅ **Server Running**: OpenWebUI is running on http://localhost:3000  
-✅ **Startup Script**: Created and made executable `start_openwebui.sh`  
+✅ **Startup Scripts**: Integrated with unified startup system (`start.sh`)  
 
 ## Quick Start Commands
 
 ### Start OpenWebUI
 ```bash
-# Using the startup script (recommended)
-./start_openwebui.sh
+# Using the unified startup script (recommended)
+./start.sh
 
-# Or manually
-source openwebui_venv/bin/activate && open-webui serve --host 0.0.0.0 --port 3000
+# Select option 1 for server mode (all services)
+echo "1" | ./start.sh
+
+# Or start individual components via start_server_mode.sh
+./start_server_mode.sh
 ```
 
 ### Access OpenWebUI
 - **Web Interface**: http://localhost:3000
 - **API Documentation**: See `docs/QWENROUTE_API_DOCUMENTATION.md`
+- **Log Monitoring**: Use `./view_logs.sh` or `python web_logs.py`
 
 ## Environment Details
 
-- **Python Version**: 3.11.11 (optimal for OpenWebUI compatibility)
+- **Python Version**: 3.12.10 (updated for better dependency compatibility)
 - **Virtual Environment**: `openwebui_venv/`
-- **Installation Path**: `/Users/jidemobell/Documents/IBMALL/TOPOLOGYKNOWLEDGE/`
+- **Installation Path**: `/Users/jidemobell/Documents/IBMALL/TOPOLOGYKNOWLEDGE/open-webui-cloned/`
 - **Default Port**: 3000 (configurable)
-- **Vector Database**: ChromaDB
+- **Vector Database**: ChromaDB v1.0.20
 - **Embedding Model**: sentence-transformers/all-MiniLM-L6-v2
+- **tiktoken Version**: v0.11.0 (with pre-built wheels for faster installation)
 
 ## Key Features Available
 
@@ -40,14 +47,22 @@ source openwebui_venv/bin/activate && open-webui serve --host 0.0.0.0 --port 300
 - **User Management**: Multi-user support with authentication
 - **API Integration**: RESTful API for backend integration
 
-## Integration with QwenRoute
+## Integration with Core Backend
 
-Your QwenRoute backend API (documented in `docs/QWENROUTE_API_DOCUMENTATION.md`) can be integrated with OpenWebUI for enhanced functionality. The QwenRoute API provides:
+Your Core Backend API (documented in `docs/QWENROUTE_API_DOCUMENTATION.md`) is fully integrated with OpenWebUI through the Knowledge Fusion layer. The unified platform provides:
 
-- Diagnostic endpoints
-- Document management
-- Case management  
-- Session handling
+- **Diagnostic endpoints**: Health monitoring and system status
+- **Document management**: Advanced document processing and retrieval
+- **Knowledge Fusion**: Enhanced search and context integration  
+- **Session handling**: Persistent user sessions and data
+- **Real-time logging**: Comprehensive monitoring tools (`view_logs.sh`, `web_logs.py`)
+
+## Recent Migration Success
+
+✅ **Fresh Installation Approach**: Successfully resolved frontend serving issues by migrating to a fresh OpenWebUI v0.6.29 clone  
+✅ **Data Preservation**: All user accounts, conversation history, and uploaded documents preserved  
+✅ **Dependency Resolution**: Fixed tiktoken and huggingface_hub compatibility issues  
+✅ **Complete Web Interface**: Full frontend now serving properly (no more API-only mode)
 - System status monitoring
 
 ## Next Steps
