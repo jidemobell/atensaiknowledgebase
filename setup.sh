@@ -127,13 +127,13 @@ main() {
 case "${1:-}" in
     --ssh)
         echo "Forcing SSH URLs..."
-        git config --file .gitmodules submodule.open-webui-cloned.url "git@github.com:jidemobell/atensai-open-webui.git"
+        git config --file .gitmodules submodule.open-webui-cloned.url "git@github.com:open-webui/open-webui.git"
         git submodule sync
         git submodule update --init --recursive
         ;;
     --https)
         echo "Forcing HTTPS URLs..."
-        git config --file .gitmodules submodule.open-webui-cloned.url "https://github.com/jidemobell/atensai-open-webui.git"
+        git config --file .gitmodules submodule.open-webui-cloned.url "https://github.com/open-webui/open-webui.git"
         git submodule sync
         git submodule update --init --recursive
         ;;
@@ -141,19 +141,32 @@ case "${1:-}" in
         echo "Configuring for enterprise/corporate environment..."
         # Force HTTPS for all GitHub URLs globally
         git config --global url."https://github.com/".insteadOf git@github.com:
-        git config --file .gitmodules submodule.open-webui-cloned.url "https://github.com/jidemobell/atensai-open-webui.git"
+        git config --file .gitmodules submodule.open-webui-cloned.url "https://github.com/open-webui/open-webui.git"
         git submodule sync
         git submodule update --init --recursive
         echo "✅ Configured for enterprise environment with HTTPS-only access"
         ;;
+    --ibm)
+        echo "🏢 Setting up for IBM Corporate Environment..."
+        echo "This will download OpenWebUI without using git submodules"
+        if [ -f "setup_ibm.sh" ]; then
+            ./setup_ibm.sh
+            echo "✅ IBM setup complete. You can now run: ./start.sh"
+            exit 0
+        else
+            echo "❌ setup_ibm.sh not found. Please ensure it exists in the repository."
+            exit 1
+        fi
+        ;;
     --help|-h)
-        echo "Usage: $0 [--ssh|--https|--enterprise|--help]"
+        echo "Usage: $0 [--ssh|--https|--enterprise|--ibm|--help]"
         echo ""
         echo "Options:"
         echo "  --ssh          Force SSH URLs (for development environments)"
         echo "  --https        Force HTTPS URLs (for basic cross-machine compatibility)"
         echo "  --enterprise   Configure for enterprise/corporate environments"
         echo "  --corporate    (same as --enterprise)"
+        echo "  --ibm          Special setup for IBM corporate networks (downloads without git submodules)"
         echo "  --help         Show this help message"
         echo ""
         echo "Without options, automatically detects the best method"
