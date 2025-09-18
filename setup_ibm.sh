@@ -57,11 +57,52 @@ download_openwebui() {
     # Move the extracted content to the target directory
     mv "$temp_extract/open-webui-main" "$download_dir"
     
+    # IBM-specific fixes for frontend assets
+    echo "🎨 Preparing frontend assets for IBM environment..."
+    cd "$download_dir"
+    
+    # Ensure frontend directory structure exists
+    mkdir -p "backend/open_webui/frontend"
+    
+    # Copy build assets if they exist
+    if [ -d "build" ]; then
+        echo "  📁 Copying frontend build assets..."
+        cp -r build/* backend/open_webui/frontend/ 2>/dev/null || echo "  ⚠️  Some build assets not found (will be built later)"
+    fi
+    
+    # Create minimal frontend structure if missing
+    if [ ! -f "backend/open_webui/frontend/index.html" ]; then
+        echo "  🔧 Creating minimal frontend structure..."
+        cat > "backend/open_webui/frontend/index.html" << 'EOF'
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenWebUI</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <div id="app">Loading OpenWebUI...</div>
+    <script>
+        // Redirect to proper OpenWebUI endpoint
+        if (window.location.pathname === '/') {
+            setTimeout(() => {
+                window.location.href = '/docs';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
+EOF
+    fi
+    
+    cd - >/dev/null
+    
     # Cleanup
     rm -f "$temp_zip"
     rm -rf "$temp_extract"
     
-    echo "✅ OpenWebUI downloaded and extracted to: $download_dir"
+    echo "✅ OpenWebUI downloaded and configured for IBM environment"
     return 0
 }
 
@@ -203,6 +244,125 @@ configure_ibm_environment() {
     echo "✅ IBM environment configuration complete"
 }
 
+# IBM-specific dependency installation
+install_ibm_dependencies() {
+    echo "🔧 Installing IBM-specific dependencies..."
+    
+    # Ensure we have a virtual environment
+    VENV_DIR="openwebui_venv"
+    if [ ! -d "$VENV_DIR" ]; then
+        echo "📦 Creating Python virtual environment..."
+        python3 -m venv "$VENV_DIR"
+    fi
+    
+    # Activate virtual environment
+    source "$VENV_DIR/bin/activate"
+    
+    # Upgrade pip with corporate proxy support
+    echo "  📈 Upgrading pip..."
+    pip install --upgrade pip --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org || true
+    
+    # IBM-specific Python packages with corporate proxy support
+    echo "  📦 Installing critical missing packages for IBM environment..."
+    
+    # Core dependencies that are often missing in corporate environments
+    local packages=(
+        "itsdangerous>=2.0.0"
+        "cryptography>=3.4.8"
+        "pycryptodome"
+        "python-multipart"
+        "uvicorn[standard]"
+        "fastapi>=0.104.0"
+        "jinja2"
+        "aiofiles"
+        "httpx"
+        "requests"
+        "pyyaml"
+        "python-jose[cryptography]"
+        "bcrypt"
+        "passlib[bcrypt]"
+        "chromadb"
+        "sentence-transformers"
+        "tiktoken>=0.7.0"
+        "packaging"
+        "wheel"
+        "setuptools"
+    )
+    
+    for package in "${packages[@]}"; do
+        echo "    Installing $package..."
+        pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \
+            --disable-pip-version-check --no-cache-dir "$package" || {
+            echo "    ⚠️  Failed to install $package, trying fallback method..."
+            pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \
+                --trusted-host index-url pypi.org --no-cache-dir --no-deps "$package" || {
+                echo "    ❌ Could not install $package - may need manual installation"
+            }
+        }
+    done
+    
+    # Install OpenWebUI from the downloaded directory
+    if [ -d "open-webui-cloned/backend" ]; then
+        echo "  🔧 Installing OpenWebUI backend..."
+        cd "open-webui-cloned/backend"
+        
+        # Install requirements first
+        if [ -f "requirements.txt" ]; then
+            pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \
+                -r requirements.txt || echo "⚠️  Some requirements may have failed to install"
+        fi
+        
+        # Install OpenWebUI in development mode
+        pip install -e . || {
+            echo "⚠️  OpenWebUI installation failed, trying alternative method..."
+            python setup.py develop || echo "❌ Please check OpenWebUI installation manually"
+        }
+        cd "../.."
+    fi
+    
+    # Verify critical packages for IBM environment
+    echo "  ✅ Verifying IBM-critical package installations..."
+    python -c "
+import sys
+import importlib
+packages = [
+    'itsdangerous', 'cryptography', 'uvicorn', 'fastapi', 
+    'tiktoken', 'jinja2', 'multipart', 'aiofiles'
+]
+missing = []
+installed = []
+
+for pkg in packages:
+    try:
+        if pkg == 'multipart':
+            importlib.import_module('multipart')
+        else:
+            importlib.import_module(pkg)
+        installed.append(pkg)
+        print(f'✅ {pkg}: OK')
+    except ImportError:
+        missing.append(pkg)
+        print(f'❌ {pkg}: MISSING')
+
+print(f'\\n📊 Status: {len(installed)} installed, {len(missing)} missing')
+
+if missing:
+    print(f'\\n⚠️  Missing critical packages: {missing}')
+    print('\\nTo install manually:')
+    print('pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \\\\')
+    print('  ' + ' '.join(missing))
+    sys.exit(1)
+else:
+    print('\\n🎉 All critical packages verified for IBM environment!')
+" || {
+        echo "⚠️  Some critical packages are missing. The system may not work properly on IBM network."
+        echo "Please try running the manual installation command shown above."
+    }
+    
+    deactivate
+    echo "✅ IBM-specific dependencies installation completed"
+}
+
 # Main execution
 main() {
     echo "🚀 IBM Corporate Network Compatible Setup Starting..."
@@ -222,6 +382,9 @@ main() {
         echo "❌ Failed to download OpenWebUI"
         exit 1
     fi
+    
+    # Install IBM-specific dependencies
+    install_ibm_dependencies
     
     # Setup Knowledge Fusion integration
     setup_knowledge_fusion "open-webui-cloned"
