@@ -27,11 +27,30 @@ fi
 # Create logs directory if it doesn't exist
 mkdir -p logs
 
-# Check if isolated virtual environment exists
+# Check if isolated virtual environment exists, create if needed
 if [ ! -d "$VENV_PATH" ]; then
-    echo -e "${RED}❌ Error: Isolated virtual environment not found at $VENV_PATH${NC}"
-    echo "Please create it first with: python3 -m venv $VENV_PATH"
-    exit 1
+    echo -e "${YELLOW}⚠️  Isolated virtual environment not found at $VENV_PATH${NC}"
+    echo "🔧 Creating isolated virtual environment for Core Backend..."
+    
+    python3 -m venv "$VENV_PATH"
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}❌ Error: Failed to create virtual environment${NC}"
+        exit 1
+    fi
+    
+    echo "📦 Installing Core Backend dependencies..."
+    source "$VENV_PATH/bin/activate"
+    pip install --upgrade pip
+    pip install fastapi uvicorn python-multipart tiktoken requests
+    
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✅ Isolated virtual environment created and configured${NC}"
+    else
+        echo -e "${RED}❌ Error: Failed to install dependencies${NC}"
+        exit 1
+    fi
+else
+    echo "🐍 Using existing isolated virtual environment at $VENV_PATH"
 fi
 
 # Check if backend directory exists

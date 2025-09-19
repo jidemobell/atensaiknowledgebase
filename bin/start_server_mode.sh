@@ -47,6 +47,21 @@ echo "🧠 Knowledge Fusion: $KNOWLEDGE_FUSION_TEMPLATE_PATH"
 echo "🌐 OpenWebUI: External service (check port $OPENWEBUI_PORT)"
 echo ""
 
+# Check virtual environments status
+echo -e "${BLUE}🐍 Virtual Environment Status:${NC}"
+if [ -d "$PROJECT_ROOT/corebackend_venv" ]; then
+    echo "  ✅ Core Backend Environment: corebackend_venv (isolated)"
+else
+    echo "  ⚠️  Core Backend Environment: Will be created automatically"
+fi
+
+if [ -d "$PROJECT_ROOT/openwebui_venv" ]; then
+    echo "  ✅ Knowledge Fusion Environment: openwebui_venv"
+else
+    echo "  ❌ Knowledge Fusion Environment: openwebui_venv (required)"
+fi
+echo ""
+
 # Pre-flight checks
 echo "🔍 Running pre-flight checks..."
 
