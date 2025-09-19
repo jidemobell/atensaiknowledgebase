@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GITHUB_SOURCES_FILE="$PROJECT_ROOT/github_sources.yml"
 REPOS_DIR="$PROJECT_ROOT/data/repositories"
 SOURCES_REGISTRY="$PROJECT_ROOT/data/sources_registry.json"

@@ -21,7 +21,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Project paths
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CORE_BACKEND_PATH="$PROJECT_ROOT/corebackend"
 KNOWLEDGE_FUSION_TEMPLATE_PATH="$PROJECT_ROOT/knowledge-fusion-template"
 

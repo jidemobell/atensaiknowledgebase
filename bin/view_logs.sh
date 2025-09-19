@@ -32,13 +32,14 @@ BLUE='\033[0;34m'
 
 # ConfigurationPURPLE='\033[0;35m'
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"CYAN='\033[0;36m'
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CYAN='\033[0;36m'
 
 LOGS_DIR="$PROJECT_ROOT/logs"NC='\033[0m' # No Color
 
 PID_FILE="$PROJECT_ROOT/.topology_pids"
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Service definitionsLOGS_DIR="$PROJECT_ROOT/logs"
 

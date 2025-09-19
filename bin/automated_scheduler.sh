@@ -15,7 +15,7 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Configuration
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCHEDULER_CONFIG="$PROJECT_ROOT/scheduler_config.json"
 LOGS_DIR="$PROJECT_ROOT/logs"
 SCRIPTS_DIR="$PROJECT_ROOT"
