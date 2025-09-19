@@ -1,462 +1,205 @@
-# Topology Kn## �🚀 Quick Setup
+# IBM Knowledge Fusion Platform
 
-### Universal Access (Works on Any Computer)
+**Beyond Basic RAG** - A next-generation knowledge integration platform that provides intelligent routing, multi-source synthesis, and advanced AI capabilities through seamless integration with OpenWebUI.
+
+## Quick Start (5 minutes)
+
 ```bash
-# Clone with HTTPS (no SSH keys needed)
-git clone https://github.com/jidemobell/knowledgebase.git
-cd knowledgebase
+# 1. Start Knowledge Fusion services
+./bin/start_server_mode.sh
 
-# Auto-detects your environment and sets up everything
-./setup.sh
+# 2. Install OpenWebUI separately  
+pip install open-webui
+open-webui serve --port 8080
 
-# Start the platform
-./start.sh
+# 3. Upload knowledge_fusion_function.py to OpenWebUI Admin Panel → Functions
+# 4. Start chatting with enhanced AI capabilities!
 ```
 
-### Alternative Setup Methods
+## Architecture Overview
 
-#### For Development (SSH if available)
-```bash
-git clone git@github.com:jidemobell/knowledgebase.git
-cd knowledgebase
-./setup.sh --dev
+```
+┌─────────────────┐    ┌──────────────────┐    ┌────────────────┐    ┌─────────────────┐
+│   OpenWebUI     │───▶│ Knowledge Fusion │───▶│ Core Backend   │───▶│     Ollama      │
+│  (External)     │    │   Gateway        │    │    Engine      │    │   Models        │
+│   Port 8080     │    │   Port 9000      │    │   Port 8001    │    │  Port 11434     │
+└─────────────────┘    └──────────────────┘    └────────────────┘    └─────────────────┘
+                                │
+                                │
+                         ┌──────▼──────┐
+                         │ Knowledge   │
+                         │  Fusion     │
+                         │ Backend     │
+                         │ Port 8002   │
+                         └─────────────┘
 ```
 
-#### For Enterprise/Corporate Environments
+This **pipe-based integration** approach allows OpenWebUI to leverage advanced Knowledge Fusion capabilities while maintaining its familiar interface.
+
+## Why Knowledge Fusion?
+
+### Traditional RAG Limitations:
+- **Single-source limitation**: Can only query one database at a time
+- **Context fragmentation**: Loses connections between related information  
+- **Static responses**: No dynamic knowledge synthesis
+- **Limited reasoning**: Simple similarity matching only
+
+### Knowledge Fusion Solution:
+- **Multi-source intelligence**: Queries multiple knowledge bases simultaneously
+- **Dynamic synthesis**: Combines information from different sources contextually
+- **Intelligent routing**: Automatically selects best knowledge sources
+- **Advanced reasoning**: Uses embedding similarity + semantic understanding
+
+## Core Services
+
+### 1. Knowledge Fusion Gateway (Port 9000)
+**The Smart Router**: Receives requests from OpenWebUI and intelligently routes them through the knowledge pipeline.
+
+### 2. Core Backend Engine (Port 8001)  
+**The Knowledge Processor**: Handles semantic search, embedding management, and core knowledge operations.
+
+### 3. Knowledge Fusion Backend (Port 8002)
+**The Intelligence Layer**: Provides advanced knowledge synthesis and multi-source reasoning.
+
+### 4. Ollama Integration (Port 11434)
+**The AI Engine**: Provides local LLM capabilities with models like Llama2, CodeLlama, and custom models.
+
+## Integration Methods
+
+### Method 1: Function Upload (Recommended)
+1. Start Knowledge Fusion services: `./bin/start_server_mode.sh`
+2. Install OpenWebUI separately: `pip install open-webui && open-webui serve`  
+3. Upload `knowledge_fusion_function.py` to Admin Panel → Functions
+4. Enable the function and start chatting!
+
+### Method 2: API Integration
+Direct API calls to `http://localhost:9000` for custom integrations.
+
+## Service Management
+
 ```bash
-git clone https://github.com/jidemobell/knowledgebase.git
-cd knowledgebase
-./setup.sh --enterprise
+# Start all Knowledge Fusion services
+./bin/start_server_mode.sh
+
+# Monitor logs
+tail -f logs/knowledge_fusion.log
+
+# Check service health
+curl http://localhost:9000/health
+curl http://localhost:8001/health
+curl http://localhost:8002/docs
 ```
 
-### 🔧 Having Access Issues?
-See **[Cross-Machine Setup Guide](docs/CROSS_MACHINE_SETUP_GUIDE.md)** for detailed troubleshooting.*Next-Generation Knowledge Synthesis Beyond Traditional RAG*
+## Scripts & Tools
 
-## � Complete Documentation
+All platform scripts are organized in the `bin/` directory:
 
-### 🎯 **NEW: [Complete User Guide](docs/COMPLETE_USER_GUIDE.md)**
-**Everything you need to know in one place:**
-- **Quick Start**: Get running in minutes
-- **Theory of Design**: Understanding the innovative architecture
-- **Usage Guide**: Practical examples and patterns
-- **Data Population**: How the system learns and evolves
-- **Future Extensions**: Roadmap and possibilities
+- **🚀 [start_server_mode.sh](bin/start_server_mode.sh)** - Main platform launcher
+- **📚 [add_knowledge_source.sh](bin/add_knowledge_source.sh)** - GitHub repository management
+- **🔄 [manage_hybrid_sources.sh](bin/manage_hybrid_sources.sh)** - Multi-source knowledge management
+- **📊 [view_logs.sh](bin/view_logs.sh)** - Advanced monitoring system
+- **⏰ [automated_scheduler.sh](bin/automated_scheduler.sh)** - Update scheduling
+- **🎭 [demo_platform.sh](bin/demo_platform.sh)** - Platform demonstration
+- **🧹 [cleanup_platform.sh](bin/cleanup_platform.sh)** - Platform cleanup
 
-## �🚀 Quick Setup
+📋 **Complete script documentation**: See [bin/README.md](bin/README.md)
 
-### Repository Cloning
+## Documentation
 
-#### For Most Users (Auto-detection)
-```bash
-git clone https://github.com/jidemobell/knowledgebase.git
-cd knowledgebase
-./setup.sh
+### Getting Started
+- **� [Startup Guide](docs/STARTUP_GUIDE.md)** - Quick 5-minute getting started  
+- **�📖 [Integration Flow](docs/INTEGRATION_FLOW.md)** - Step-by-step setup and integration guide
+
+### Architecture & Design
+- **🏗️ [Knowledge Fusion Architecture](docs/KNOWLEDGE_FUSION_ARCHITECTURE.md)** - Core platform architecture
+- **🤖 [AI Agent Architecture](docs/AI_AGENT_ARCHITECTURE.md)** - Multi-agent system design
+- **📋 [API Documentation](docs/API_DOCUMENTATION_SUMMARY.md)** - Complete API reference
+
+### Platform Status
+- **✅ [Platform Completion Summary](docs/PLATFORM_COMPLETION_SUMMARY.md)** - Current capabilities overview
+- **🧹 [Platform Cleanup Summary](docs/PLATFORM_CLEANUP_SUMMARY.md)** - Optimization and cleanup details
+
+### Advanced Documentation
+- **📚 [Core Backend Architecture](docs/corebackend/ADVANCED_ARCHITECTURE.md)** - Backend system details
+- **⚙️ [Implementation Guide](docs/implementation/COREBACKEND_README.md)** - Technical implementation details
+- **📋 [Planning Documents](docs/planning/)** - Project roadmaps and technical plans
+- **📖 [Reference Materials](docs/reference/)** - Data models, query examples, and technical reference
+
+## Key Features
+
+### Intelligent Query Routing
+```python
+# Automatically routes queries to appropriate knowledge sources
+query = "How do I implement authentication in our React app?"
+# → Routes to: Engineering docs + Code examples + Security policies
 ```
 
-#### For Enterprise/IBM Environments (HTTPS only)
-```bash
-git clone https://github.com/jidemobell/knowledgebase.git
-cd knowledgebase
-./setup.sh --https
+### Multi-Source Synthesis  
+```python
+# Combines information from multiple knowledge bases
+query = "What's our company policy on remote work and related tools?"
+# → Synthesizes: HR policies + IT guidelines + Manager resources
 ```
 
-#### For Development Environments (SSH preferred)
-```bash
-git clone git@github.com:jidemobell/knowledgebase.git
-cd knowledgebase
-./setup.sh --ssh
+### Dynamic Context Management
+```python
+# Maintains conversation context across knowledge sources
+follow_up = "What about international employees?"
+# → Builds on previous response with relevant international policies
 ```
 
-#### Manual Submodule Setup
+## API Examples
+
+### Basic Knowledge Query
 ```bash
-# If open-webui-cloned folder is empty after cloning:
-git submodule update --init --recursive
+curl -X POST http://localhost:9000/query \
+  -H "Content-Type: application/json" \
+  -d '{"query": "machine learning best practices", "max_results": 5}'
 ```
 
-> **🏢 Enterprise Note**: The setup script automatically detects your environment and uses the appropriate connection method (HTTPS for enterprise, SSH for development).
-
-### One-Command Launch
+### Advanced Multi-Source Query
 ```bash
-./start.sh
-# Select option 1: 🖥️ SERVER MODE
-# Access at http://localhost:3000
+curl -X POST http://localhost:9000/synthesize \
+  -H "Content-Type: application/json" \
+  -d '{"query": "project management tools", "sources": ["docs", "wikis", "code"]}'
 ```
+
+## Troubleshooting
+
+### Common Issues
+
+**Services won't start**:
+```bash
+# Check logs
+tail -f logs/knowledge_fusion.log
+
+# Verify ports
+netstat -an | grep -E "(8001|8002|9000|11434)"
+```
+
+**OpenWebUI connection issues**:
+```bash
+# Test Knowledge Fusion Gateway  
+curl http://localhost:9000/health
+
+# Check OpenWebUI status
+curl http://localhost:8080/health
+```
+
+**Function upload problems**:
+- Ensure OpenWebUI is running on port 8080
+- Upload `knowledge_fusion_function.py` (not as ZIP)
+- Enable the function after upload
+
+## Future Roadmap
+
+- **Watson.ai Integration**: Enterprise-grade AI capabilities
+- **Advanced Vector Search**: Hybrid search with multiple embedding models
+- **Real-time Collaboration**: Multi-user knowledge sharing
+- **Custom Knowledge Connectors**: Easy integration with enterprise systems
 
 ---
 
-## 🧠 Beyond RAG: Intelligent Knowledge Topology
+**Ready to experience "Beyond Basic RAG"?** Start with the [5-minute Quick Start Guide](docs/STARTUP_GUIDE.md)!
 
-Unlike traditional RAG systems that simply retrieve and inject documents, the Topology Knowledge Platform represents a fundamental paradigm shift. We've architected an **intelligent knowledge synthesis engine** that understands the topology of information—the complex relationships, dependencies, and contextual connections that exist within and across knowledge domains.
-
-### Traditional RAG Limitations
-- Static document retrieval with limited context
-- No relationship mapping between concepts
-- Isolated information silos
-- Surface-level semantic matching
-
-### Our Topology Approach
-- **🗺️ Semantic Knowledge Mapping**: Understanding how concepts relate across domains
-- **🔄 Dynamic Context Synthesis**: Building coherent narratives from fragmented sources  
-- **📈 Adaptive Learning Networks**: Knowledge graphs that evolve with usage patterns
-- **🔍 Multi-Dimensional Analysis**: Code, documentation, issues, and discussions as interconnected layers
-
----
-
-## 🚀 Quick Start
-
-### One-Command Launch
-```bash
-./start.sh
-```
-
-Choose your deployment strategy:
-
-#### 🖥️ **Server Mode** (Development & Maximum Control)
-```bash
-./start_server_mode.sh
-```
-- Direct service access and debugging
-- Real-time log monitoring  
-- Easy configuration adjustments
-- Optimal for development and customization
-
-#### 🐳 **Containerized Mode** (Production & Consistency)
-```bash
-./start_docker_mode.sh
-```
-- Containerized deployment with isolated environments
-- **Docker & Podman Support** - Automatically detects your container runtime
-- Automatic service orchestration
-- Production-ready configuration
-- Consistent deployment across systems (perfect for IBM/enterprise environments)
-
----
-
-## 🏗️ System Architecture
-
-```mermaid
-graph TB
-    UI[OpenWebUI Interface :3000] --> KF[Knowledge Fusion Engine :8002]
-    KF --> CB[Core Backend :8001]
-    KF --> GH[GitHub Repository Mining]
-    CB --> OL[Ollama Models :11434]
-    KF --> KG[Knowledge Graph Builder]
-    KG --> IDX[Semantic Indexes]
-    
-    subgraph "Knowledge Processing Pipeline"
-        GH --> EXT[Content Extraction]
-        EXT --> REL[Relationship Detection]
-        REL --> SYN[Semantic Synthesis]
-        SYN --> KG
-    end
-    
-    subgraph "Backend Services"
-        CB --> DOC[Document Management]
-        CB --> CASE[Case Processing]  
-        CB --> CTX[Context Management]
-    end
-```
-
-### Core Components
-
-#### 🎯 **OpenWebUI Frontend** (Port 3000)
-Modern conversational interface providing:
-- Real-time visualization of knowledge connections
-- Multi-modal interaction supporting text, code, and visual elements
-- Context-aware suggestion engine
-- Interactive knowledge exploration
-
-#### 🔮 **IBM Knowledge Fusion Engine** (Port 8002)
-Revolutionary knowledge synthesis layer that:
-- **Mines GitHub repositories** for code patterns, documentation, and project relationships
-- **Builds semantic knowledge graphs** connecting concepts across repositories
-- **Identifies knowledge gaps** and suggests missing connections
-- **Creates dynamic context windows** that expand based on conversation depth
-
-#### ⚡ **QwenRoute Core Backend** (Port 8001)
-High-performance FastAPI service providing:
-- Advanced document processing with semantic chunking
-- Case management for complex knowledge domains
-- Session context preservation across interactions
-- Real-time knowledge graph updates
-
-#### 🤖 **Ollama Model Infrastructure** (Port 11434)
-- Local LLM hosting optimized for knowledge synthesis
-- Multi-model ensemble for specialized reasoning
-- Context-aware model selection based on query complexity
-
----
-
-## 📊 Knowledge Integration Pipeline
-
-### 1. Repository Mining & Content Extraction
-The Knowledge Fusion engine automatically:
-- **Clones and analyzes** GitHub repositories from `github_sources.yml`
-- **Extracts semantic content** from code, documentation, issues, and wikis
-- **Identifies project relationships** and cross-references
-- **Maps contributor expertise** and knowledge ownership
-
-### 2. Semantic Processing & Relationship Mapping
-- **Content vectorization** using state-of-the-art embeddings
-- **Relationship extraction** between code concepts and documentation
-- **Dependency mapping** across repositories and technologies
-- **Knowledge graph construction** with weighted connections
-
-### 3. Dynamic Synthesis & Context Generation
-- **Context-aware retrieval** based on conversation history
-- **Multi-source synthesis** combining code, docs, and community knowledge
-- **Gap identification** highlighting missing information or connections
-- **Adaptive learning** improving responses based on user interactions
-
----
-
-## 🎯 Beyond Traditional RAG: Novel Approaches
-
-### Temporal Knowledge Synthesis
-Our system doesn't just retrieve current information—it understands:
-- **Historical patterns** in code evolution and documentation changes
-- **Current state analysis** across multiple repositories and sources
-- **Predictive insights** about potential issues and optimization opportunities
-
-### Multi-Agent Knowledge Orchestration
-Unlike single-model approaches, we employ:
-- **Specialized agents** for different knowledge domains (code, docs, issues)
-- **Collaborative synthesis** where agents build upon each other's findings
-- **Dynamic routing** to the most appropriate model based on query complexity
-
-### Adaptive Knowledge Graphs
-Our knowledge representation:
-- **Evolves dynamically** based on user interactions and new content
-- **Maintains confidence weights** for different information sources
-- **Identifies knowledge boundaries** and areas requiring human expertise
-
----
-
-## 🔧 Configuration & Customization
-
-### GitHub Knowledge Sources
-Configure repositories in `github_sources.yml`:
-```yaml
-repositories:
-  - name: "core-platform"
-    url: "https://github.com/your-org/platform"
-    branch: "main" 
-    focus_areas: ["architecture", "api-docs", "examples"]
-    
-  - name: "ml-toolkit"
-    url: "https://github.com/your-org/ml-tools" 
-    branch: "develop"
-    focus_areas: ["algorithms", "datasets", "benchmarks"]
-```
-
-### Backend Configuration
-Core services utilize `.env` settings:
-```bash
-# Knowledge Fusion Settings
-KNOWLEDGE_FUSION_DEPTH=3           # Relationship traversal depth
-KNOWLEDGE_FUSION_SIMILARITY=0.8    # Semantic similarity threshold
-
-# Core Backend Settings
-CORE_BACKEND_CACHE_SIZE=1000       # Document cache size
-CORE_BACKEND_CONTEXT_WINDOW=4096   # Context preservation limit
-
-# Model Settings
-OLLAMA_MODELS=mistral,codellama     # Available models
-OLLAMA_TIMEOUT=30                   # Response timeout
-```
-
----
-
-## 🛠️ Backend Service Integration
-
-### How the Backends Work Together
-
-#### Knowledge Fusion Engine (Port 8002)
-**Primary Role**: Intelligent knowledge synthesis and GitHub integration
-- **Repository Analysis**: Deep mining of code structure, documentation, and metadata
-- **Semantic Indexing**: Building searchable knowledge representations  
-- **Relationship Mapping**: Connecting concepts across repositories and domains
-- **Context Generation**: Creating rich context for LLM interactions
-
-**Data Sources**:
-- GitHub repositories (code, docs, issues, wikis)
-- Local document uploads
-- Conversation history and user preferences
-- External APIs and knowledge bases
-
-#### Core Backend (Port 8001) 
-**Primary Role**: Document processing and case management
-- **Document Processing**: Advanced parsing with semantic chunking strategies
-- **Case Management**: Structured handling of complex knowledge domains
-- **Session Context**: Preserving conversation state and learned preferences
-- **Real-time Updates**: Dynamic knowledge graph maintenance
-
-**Use Cases**:
-- Processing uploaded documents and files
-- Managing structured knowledge cases
-- Maintaining conversation context across sessions
-- Providing fast document retrieval and search
-
-### Data Flow Architecture
-```
-GitHub Repos → Content Extraction → Semantic Analysis → Knowledge Graph
-     ↓              ↓                    ↓                ↓
-User Query → Context Building → Multi-Source Synthesis → Response Generation
-     ↓              ↓                    ↓                ↓
-Knowledge Fusion (8002) → Core Backend (8001) → Ollama (11434) → OpenWebUI (3000)
-```
-
-### Installation & Data Management
-
-The unified startup system automatically:
-
-1. **Sets up Python 3.11 environment** optimized for OpenWebUI compatibility
-2. **Installs all dependencies** including Knowledge Fusion and Core Backend services
-3. **Configures GitHub integration** based on `github_sources.yml`
-4. **Initializes knowledge bases** from configured repositories
-5. **Starts all services** with proper health checks and monitoring
-
-**Where Knowledge Data Lives**:
-- **Repository clones**: `openwebuibase/knowledge-fusion/repositories/`
-- **Processed indexes**: `openwebuibase/knowledge-fusion/indexes/`
-- **Knowledge graphs**: `corebackend/implementation/knowledge_graphs/`
-- **Document cache**: `corebackend/implementation/cache/`
-- **Session data**: `openwebuibase/backend/data/`
-
-**GitHub Repository Incorporation**:
-The system continuously:
-- **Monitors configured repositories** for changes
-- **Extracts knowledge patterns** from code and documentation
-- **Updates semantic indexes** with new content
-- **Maintains relationship mappings** between concepts
-- **Preserves historical context** for temporal analysis
-
----
-
-## 🎯 Advanced Usage Patterns
-
-### Knowledge Exploration
-Instead of simple Q&A, engage in **knowledge discovery**:
-- *"Show me the architectural patterns used across our microservices"*
-- *"How do the authentication systems in these three repos connect?"*
-- *"What are the common performance bottlenecks mentioned in issues?"*
-
-### Code Understanding  
-Go beyond basic code search:
-- *"Explain the data flow from user input to database in this system"*
-- *"What design patterns are consistently used across these repositories?"*
-- *"How would implementing feature X affect the existing architecture?"*
-
-### Documentation Synthesis
-Create comprehensive overviews:
-- *"Generate an onboarding guide combining all our repository READMEs"*
-- *"What are the best practices mentioned across our codebases?"*
-- *"Create a troubleshooting guide from our collective issue discussions"*
-
----
-
-## 📚 Documentation Library
-
-### 🚀 Essential Guides
-- **[Complete Setup Guide](docs/COMPLETE_SETUP_GUIDE.md)** - Detailed installation and configuration
-- **[Setup Completion Summary](docs/SETUP_COMPLETION_SUMMARY.md)** - ✅ Current platform status and verification
-- **[Unified Startup Guide](docs/UNIFIED_STARTUP_GUIDE.md)** - Complete deployment instructions
-- **[API Documentation](docs/QWENROUTE_API_DOCUMENTATION.md)** - Complete backend API reference
-- **[IBM Deployment Guide](docs/IBM_DEPLOYMENT_GUIDE.md)** - Enterprise deployment strategies
-
-### 🏗️ Architecture & Design
-- **[Knowledge Fusion Architecture](docs/KNOWLEDGE_FUSION_ARCHITECTURE.md)** - Deep dive into synthesis engine
-- **[Project Vision](docs/PROJECT_VISION.md)** - Long-term roadmap and innovation goals
-- **[Integration Plan](docs/INTEGRATION_PLAN.md)** - Component integration strategy
-
-### 🔧 Technical References
-- **[Model Integration](docs/MODEL_INTEGRATION.md)** - LLM configuration and optimization
-- **[Docker Deployment](docs/DOCKER_DEPLOYMENT.md)** - Container orchestration details
-- **[Podman Support](docs/PODMAN_SUPPORT.md)** - Enterprise container runtime compatibility
-- **[OpenWebUI Setup](docs/OPENWEBUI_SETUP.md)** - Frontend configuration
-- **[OpenWebUI Success](docs/OPENWEBUI_SUCCESS.md)** - Installation verification and status
-- **[Core Backend Dependencies Fixed](docs/CORE_BACKEND_DEPENDENCIES_FIXED.md)** - Dependency resolution details
-
-> **🏢 Enterprise Note**: Our containerized mode automatically detects and supports both **Docker** and **Podman**. Perfect for IBM and other enterprise environments where Podman is preferred. The system seamlessly adapts to your container runtime without any configuration changes.
-
-### 📋 Operations
-- **[Migration Guide](docs/MIGRATION_GUIDE.md)** - Environment transfer procedures
-- **[OpenWebUI Fresh Migration](docs/OPENWEBUI_FRESH_MIGRATION.md)** - Fresh installation migration guide
-- **[Log Monitoring Guide](docs/LOG_MONITORING_GUIDE.md)** - Comprehensive logging and monitoring tools
-- **[Git Submodule Guide](docs/GIT_SUBMODULE_GUIDE.md)** - Managing the OpenWebUI submodule
-- **[SSO Integration](docs/SSO_INTEGRATION_GUIDE.md)** - Enterprise authentication setup
-- **[Startup Guide](docs/STARTUP_GUIDE.md)** - Quick testing and demo procedures
-
-> **🔧 Repository Setup**: This project uses git submodules for OpenWebUI integration. When cloning, use `git clone --recursive` or run `git submodule update --init --recursive` after cloning.
-
----
-
-## 🚨 Troubleshooting
-
-### Service Health Check
-```bash
-./start.sh
-# Select: "3) Check Service Status"
-```
-
-### Common Resolutions
-- **Port Conflicts**: Verify ports 3000, 8001, 8002, 11434 are available
-- **Ollama Issues**: Ensure models are pulled with `ollama list`
-- **Memory Constraints**: Monitor RAM usage during large repository processing
-- **GitHub Rate Limits**: Configure authentication tokens for private repos
-
-### Debug Mode
-Enable detailed logging:
-```bash
-export DEBUG_MODE=true
-./start_server_mode.sh
-```
-
----
-
-## 🌟 What Makes This Revolutionary
-
-Unlike traditional RAG systems that simply retrieve and inject documents, our Topology Knowledge Platform:
-
-### 1. **Understands Relationships**
-Maps how concepts connect across different repositories, documentation, and conversation contexts—not just keyword matching but true semantic understanding.
-
-### 2. **Learns Contextually**  
-Builds understanding of your specific knowledge domain and usage patterns, adapting responses based on your project's unique characteristics.
-
-### 3. **Synthesizes Intelligently**
-Creates novel insights by combining information from multiple sources, identifying patterns and connections that weren't explicitly documented.
-
-### 4. **Evolves Dynamically**
-Continuously improves knowledge graphs based on new content, user interactions, and emerging patterns in your repositories.
-
-### 5. **Preserves Context**
-Maintains conversation threads that build upon previous knowledge discoveries, creating a persistent understanding that grows over time.
-
-### 6. **Anticipates Needs**
-Uses temporal analysis to predict potential issues, suggest optimizations, and highlight knowledge gaps before they become problems.
-
----
-
-## 🎯 Innovation Highlights
-
-### Temporal Knowledge Synthesis
-- **Historical Analysis**: Understanding how your codebase and documentation have evolved
-- **Current State Mapping**: Real-time analysis of your complete knowledge landscape
-- **Future Predictions**: Identifying potential issues and optimization opportunities
-
-### Multi-Agent Orchestration
-- **Specialized Agents**: Different models optimized for code, documentation, and conversation
-- **Collaborative Intelligence**: Agents that build upon each other's findings
-- **Dynamic Routing**: Intelligent selection of the best model for each query type
-
-### Novel Architecture Patterns
-- **Knowledge Graph Evolution**: Graphs that learn and adapt based on usage
-- **Confidence Weighting**: Understanding reliability and trustworthiness of different sources
-- **Semantic Bridging**: Connecting concepts across traditionally isolated domains
-
----
-
-This isn't just better search—it's **intelligent knowledge partnership** that grows with your understanding and helps you discover connections you never knew existed.
-
-**Transform your repositories into intelligent knowledge ecosystems. Start exploring the topology of your information landscape today.**
+📚 **Complete Documentation Index**: See [docs/](docs/) for all documentation organized by category.

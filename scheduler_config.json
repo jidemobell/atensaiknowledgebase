@@ -1,0 +1,72 @@
+{
+  "version": "1.0",
+  "enabled": true,
+  "schedules": {
+    "github-updates": {
+      "type": "github",
+      "schedule": "0 2 */3 * *",
+      "enabled": true,
+      "created": "2025-09-19T00:16:19Z",
+      "last_run": null,
+      "next_run": null,
+      "run_count": 0,
+      "success_count": 0,
+      "failure_count": 0,
+      "average_duration": 0,
+      "description": "Automated update for github sources"
+    },
+    "web-content-updates": {
+      "type": "web",
+      "schedule": "0 3 * * *",
+      "enabled": true,
+      "created": "2025-09-19T00:16:32Z",
+      "last_run": null,
+      "next_run": null,
+      "run_count": 0,
+      "success_count": 0,
+      "failure_count": 0,
+      "average_duration": 0,
+      "description": "Automated update for web sources"
+    },
+    "api-data-updates": {
+      "type": "api",
+      "schedule": "0 */6 * * *",
+      "enabled": true,
+      "created": "2025-09-19T00:16:32Z",
+      "last_run": null,
+      "next_run": null,
+      "run_count": 0,
+      "success_count": 0,
+      "failure_count": 0,
+      "average_duration": 0,
+      "description": "Automated update for api sources"
+    },
+    "document-updates": {
+      "type": "documents",
+      "schedule": "0 4 * * 0",
+      "enabled": true,
+      "created": "2025-09-19T00:16:32Z",
+      "last_run": null,
+      "next_run": null,
+      "run_count": 0,
+      "success_count": 0,
+      "failure_count": 0,
+      "average_duration": 0,
+      "description": "Automated update for documents sources"
+    }
+  },
+  "settings": {
+    "max_concurrent_updates": 3,
+    "retry_attempts": 3,
+    "retry_delay": 300,
+    "log_retention_days": 30,
+    "notification_enabled": false,
+    "conflict_resolution": "latest_wins"
+  },
+  "last_run": {},
+  "statistics": {
+    "total_runs": 0,
+    "successful_runs": 0,
+    "failed_runs": 0
+  }
+}

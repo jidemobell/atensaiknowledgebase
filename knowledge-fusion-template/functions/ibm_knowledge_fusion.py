@@ -24,7 +24,7 @@ class Function:
     
     def __init__(self):
         # Configuration
-        self.knowledge_fusion_url = "http://localhost:8001"  # Your enhanced backend
+        self.knowledge_fusion_url = "http://localhost:8002"  # Your enhanced backend
         self.function_id = "ibm_knowledge_fusion"
         self.name = "IBM Knowledge Fusion"
         self.description = "Intelligent multi-source knowledge synthesis for technical support"

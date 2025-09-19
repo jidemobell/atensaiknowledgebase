@@ -1,6 +1,7 @@
 """
 Enhanced Backend for OpenWebUI Integration
-Extends your existing backend with conversational AI capabilities
+Multi-Agent Knowledge Fusion System - Beyond Traditional RAG
+Features: Intent-aware processing, temporal reasoning, cross-source validation
 """
 
 from fastapi import FastAPI, HTTPException
@@ -9,13 +10,19 @@ from pydantic import BaseModel
 from typing import Dict, List, Optional, Any
 import uuid
 import json
+import asyncio
 from datetime import datetime
 from pathlib import Path
+import sys
+
+# Add the multi-agent architecture module
+sys.path.append(str(Path(__file__).parent.parent))
+from multi_agent_architecture import MultiAgentOrchestrator, KnowledgeItem
 
 app = FastAPI(
-    title="IBM Knowledge Fusion Platform - Enhanced for OpenWebUI", 
-    version="3.0.0",
-    description="Conversational AI with multi-source knowledge fusion"
+    title="IBM Knowledge Fusion Platform - Multi-Agent Architecture", 
+    version="4.0.0",
+    description="Advanced multi-agent knowledge fusion system beyond traditional RAG"
 )
 
 # Enable CORS for OpenWebUI
@@ -44,12 +51,29 @@ class ConversationContext(BaseModel):
     active_knowledge_areas: List[str] = []
     session_metadata: Dict[str, Any] = {}
 
-class KnowledgeFusionQuery(BaseModel):
+class AdvancedKnowledgeFusionQuery(BaseModel):
     query: str
     conversation_id: Optional[str] = None
     user_id: Optional[str] = None
     preferred_sources: List[str] = []
     context_window: int = 5  # Number of previous messages to consider
+    enable_temporal_reasoning: bool = True
+    enable_cross_validation: bool = True
+    complexity_threshold: str = "auto"  # auto, simple, medium, complex
+
+class AdvancedKnowledgeFusionResponse(BaseModel):
+    response: str
+    sources_used: List[str]
+    confidence: float
+    reasoning_chain: List[str]
+    intent_detected: str
+    complexity_level: str
+    suggested_follow_ups: List[str]
+    conversation_id: str
+    knowledge_areas_detected: List[str]
+    execution_time: float
+    agent_metrics: Dict[str, Any]
+    cross_validation_score: Optional[float] = None
 
 class KnowledgeFusionResponse(BaseModel):
     response: str
@@ -60,7 +84,7 @@ class KnowledgeFusionResponse(BaseModel):
     conversation_id: str
     knowledge_areas_detected: List[str]
 
-# Enhanced storage with conversation support
+# Enhanced storage with multi-agent conversation support
 enhanced_store = {
     'conversations': {},  # conversation_id -> ConversationContext
     'knowledge_areas': {
@@ -68,11 +92,155 @@ enhanced_store = {
         'github_code': [],
         'documentation': [],
         'chat_history': [],
-        'external_apis': []
+        'external_apis': [],
+        'web_content': [],
+        'databases': []
     },
     'user_profiles': {},  # user preferences and history
-    'fusion_analytics': []  # Track what sources work best
+    'fusion_analytics': [],  # Track what sources work best
+    'agent_performance': {}  # Track agent collaboration metrics
 }
+
+# Initialize Multi-Agent Orchestrator
+multi_agent_orchestrator = MultiAgentOrchestrator()
+
+class AdvancedSourceFusion:
+    """
+    Advanced knowledge fusion using multi-agent architecture
+    Goes beyond traditional RAG with intent analysis, temporal reasoning, and cross-validation
+    """
+    
+    def __init__(self):
+        self.conversation_manager = ConversationManager()
+        self.orchestrator = multi_agent_orchestrator
+    
+    async def fuse_knowledge_with_agents(self, query: str, conversation_id: str, user_id: str, 
+                                       enable_temporal: bool = True, enable_validation: bool = True) -> Dict[str, Any]:
+        """Main knowledge fusion using multi-agent system"""
+        
+        # Get conversation context for temporal reasoning
+        context = self.conversation_manager.get_conversation_context(conversation_id)
+        user_context = {
+            'conversation_history': [{'role': msg.role, 'content': msg.content} for msg in context],
+            'user_preferences': enhanced_store['user_profiles'].get(user_id, {}),
+            'enable_temporal_reasoning': enable_temporal,
+            'enable_cross_validation': enable_validation
+        }
+        
+        # Process through multi-agent system
+        agent_result = await self.orchestrator.process_query(
+            query=query,
+            conversation_id=conversation_id,
+            user_context=user_context
+        )
+        
+        # Create and store conversation messages
+        user_msg = ChatMessage(
+            id=str(uuid.uuid4()),
+            role="user",
+            content=query,
+            timestamp=datetime.now(),
+            sources_used=[],
+            metadata={"intent": agent_result.get('intent_detected')}
+        )
+        
+        assistant_msg = ChatMessage(
+            id=str(uuid.uuid4()),
+            role="assistant",
+            content=agent_result['response'],
+            timestamp=datetime.now(),
+            sources_used=agent_result['sources_used'],
+            confidence=agent_result['confidence'],
+            metadata={
+                "reasoning_chain": agent_result.get('reasoning_chain', []),
+                "complexity_level": agent_result.get('complexity_level'),
+                "agent_metrics": agent_result.get('agent_metrics', {})
+            }
+        )
+        
+        # Store messages
+        conversation = self.conversation_manager.get_or_create_conversation(conversation_id, user_id)
+        self.conversation_manager.add_message(conversation_id, user_msg)
+        self.conversation_manager.add_message(conversation_id, assistant_msg)
+        
+        # Generate follow-up suggestions based on intent and complexity
+        follow_ups = self._generate_intelligent_followups(agent_result)
+        
+        return {
+            'response': agent_result['response'],
+            'sources_used': agent_result['sources_used'],
+            'confidence': agent_result['confidence'],
+            'reasoning_chain': agent_result.get('reasoning_chain', []),
+            'intent_detected': agent_result.get('intent_detected', 'general'),
+            'complexity_level': agent_result.get('complexity_level', 'medium'),
+            'suggested_follow_ups': follow_ups,
+            'conversation_id': conversation_id,
+            'knowledge_areas_detected': [agent_result.get('intent_detected', 'general')],
+            'execution_time': agent_result.get('execution_time', 0.0),
+            'agent_metrics': agent_result.get('agent_metrics', {}),
+            'cross_validation_score': self._calculate_cross_validation_score(agent_result)
+        }
+    
+    def _generate_intelligent_followups(self, agent_result: Dict[str, Any]) -> List[str]:
+        """Generate context-aware follow-up suggestions"""
+        intent = agent_result.get('intent_detected', 'general')
+        complexity = agent_result.get('complexity_level', 'medium')
+        
+        followup_templates = {
+            'troubleshooting': [
+                "Would you like me to analyze similar past incidents?",
+                "Should I check for related configuration issues?",
+                "Do you need step-by-step debugging guidance?"
+            ],
+            'information_seeking': [
+                "Would you like more detailed documentation on this topic?",
+                "Should I find related examples or use cases?",
+                "Do you need implementation guidance?"
+            ],
+            'code_analysis': [
+                "Would you like me to review the code quality?",
+                "Should I look for optimization opportunities?",
+                "Do you need security analysis for this code?"
+            ],
+            'historical_inquiry': [
+                "Would you like to see trends over time for this issue?",
+                "Should I compare with more recent similar cases?",
+                "Do you need a timeline of related events?"
+            ]
+        }
+        
+        base_followups = followup_templates.get(intent, [
+            "Would you like me to explore this topic further?",
+            "Should I look into related areas?",
+            "Do you need more specific information?"
+        ])
+        
+        # Adjust based on complexity
+        if complexity == 'complex':
+            base_followups.append("Would you like me to break this down into simpler components?")
+        elif complexity == 'simple':
+            base_followups.append("Would you like to explore more advanced aspects of this topic?")
+        
+        return base_followups[:3]  # Return top 3
+    
+    def _calculate_cross_validation_score(self, agent_result: Dict[str, Any]) -> Optional[float]:
+        """Calculate cross-validation score based on source agreement"""
+        sources_used = agent_result.get('sources_used', [])
+        
+        if len(sources_used) < 2:
+            return None
+        
+        # Simple cross-validation score based on source diversity and confidence
+        source_diversity = len(set(sources_used)) / max(len(sources_used), 1)
+        base_confidence = agent_result.get('confidence', 0.5)
+        
+        # Cross-validation boost for multiple agreeing sources
+        validation_score = (source_diversity * 0.3) + (base_confidence * 0.7)
+        
+        return min(1.0, validation_score)
+
+# Initialize the advanced fusion system
+advanced_source_fusion = AdvancedSourceFusion()
 
 class KnowledgeRouter:
     """
@@ -351,15 +519,16 @@ async def health_check():
     return {
         "status": "healthy",
         "timestamp": datetime.now().isoformat(),
-        "version": "3.0.0",
-        "service": "Knowledge Fusion Platform"
+        "version": "4.0.0",
+        "service": "Knowledge Fusion Platform - Multi-Agent Architecture",
+        "agents_status": multi_agent_orchestrator.get_system_status()
     }
 
 @app.post("/knowledge-fusion/query")
-async def knowledge_fusion_query(request: KnowledgeFusionQuery) -> KnowledgeFusionResponse:
+async def advanced_knowledge_fusion_query(request: AdvancedKnowledgeFusionQuery) -> AdvancedKnowledgeFusionResponse:
     """
-    Main endpoint for OpenWebUI integration
-    Handles conversational queries with multi-source knowledge fusion
+    Advanced multi-agent knowledge fusion endpoint
+    Features: Intent analysis, temporal reasoning, cross-source validation
     """
     try:
         # Generate conversation ID if not provided
@@ -370,17 +539,66 @@ async def knowledge_fusion_query(request: KnowledgeFusionQuery) -> KnowledgeFusi
         if not request.user_id:
             request.user_id = "default_user"
         
-        # Process the query through knowledge fusion
-        response = source_fusion.fuse_knowledge(
+        # Process the query through advanced multi-agent fusion
+        response_data = await advanced_source_fusion.fuse_knowledge_with_agents(
             query=request.query,
             conversation_id=request.conversation_id,
-            user_id=request.user_id
+            user_id=request.user_id,
+            enable_temporal=request.enable_temporal_reasoning,
+            enable_validation=request.enable_cross_validation
         )
         
-        return response
+        return AdvancedKnowledgeFusionResponse(**response_data)
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Knowledge fusion error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Multi-agent knowledge fusion error: {str(e)}")
+
+@app.post("/knowledge-fusion/simple-query")
+async def simple_knowledge_fusion_query(request: Dict[str, Any]):
+    """
+    Simplified endpoint for basic queries (backward compatibility)
+    """
+    try:
+        advanced_request = AdvancedKnowledgeFusionQuery(
+            query=request.get('query', ''),
+            conversation_id=request.get('conversation_id'),
+            user_id=request.get('user_id', 'default_user')
+        )
+        
+        response = await advanced_knowledge_fusion_query(advanced_request)
+        
+        return {
+            "response": response.response,
+            "confidence": response.confidence,
+            "sources_used": response.sources_used,
+            "reasoning": response.reasoning_chain[-1] if response.reasoning_chain else "Multi-agent processing completed"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Simple fusion error: {str(e)}")
+
+@app.get("/system/agent-status")
+async def get_agent_system_status():
+    """Get detailed multi-agent system status"""
+    return multi_agent_orchestrator.get_system_status()
+
+@app.get("/system/metrics")
+async def get_system_metrics():
+    """Get comprehensive system performance metrics"""
+    agent_status = multi_agent_orchestrator.get_system_status()
+    
+    return {
+        "system_health": agent_status.get('system_health', 'unknown'),
+        "orchestrator_metrics": agent_status.get('orchestrator_metrics', {}),
+        "agent_performance": {
+            agent_name: agent_data.get('performance_metrics', {})
+            for agent_name, agent_data in agent_status.get('agent_status', {}).items()
+        },
+        "knowledge_store_size": {
+            area: len(data) for area, data in enhanced_store['knowledge_areas'].items()
+        },
+        "active_conversations": len(enhanced_store['conversations'])
+    }
 
 @app.get("/conversations/{conversation_id}")
 async def get_conversation(conversation_id: str):
@@ -409,14 +627,21 @@ async def upload_knowledge_cases(cases: List[Dict[str, Any]]):
 @app.post("/query")
 async def legacy_query(request: Dict[str, Any]):
     """Legacy endpoint for backward compatibility"""
-    fusion_request = KnowledgeFusionQuery(
-        query=request.get('query', ''),
-        conversation_id=request.get('conversation_id'),
-        user_id=request.get('user_id')
-    )
-    
-    response = await knowledge_fusion_query(fusion_request)
-    return {"response": response.response, "confidence": response.confidence}
+    try:
+        advanced_request = AdvancedKnowledgeFusionQuery(
+            query=request.get('query', ''),
+            conversation_id=request.get('conversation_id'),
+            user_id=request.get('user_id', 'default_user')
+        )
+        
+        response = await advanced_knowledge_fusion_query(advanced_request)
+        return {
+            "response": response.response, 
+            "confidence": response.confidence,
+            "sources": response.sources_used
+        }
+    except Exception as e:
+        return {"response": f"Error processing query: {str(e)}", "confidence": 0.0}
 
 if __name__ == "__main__":
     import uvicorn

@@ -2,140 +2,295 @@
 
 ## Overview
 
-The IBM Knowledge Fusion Platform is a sophisticated conversational AI system that extends beyond traditional RAG (Retrieval-Augmented Generation) approaches. It provides intelligent multi-source knowledge synthesis through a dual-backend architecture integrated with OpenWebUI for conversational interfaces.
+The IBM Knowledge Fusion Platform is a cutting-edge conversational AI system that goes beyond traditional RAG (Retrieval-Augmented Generation) approaches. It implements intelligent multi-source knowledge synthesis through a **pipe-based integration architecture** with OpenWebUI, providing seamless access to advanced knowledge capabilities without requiring modifications to existing OpenWebUI installations.
 
 ## System Architecture
 
-### 1. **Dual Backend Architecture**
-
-#### Original Backend (`qwenroute/implementation/backend/`)
-- **Purpose**: Case management and diagnostic system
-- **Port**: 8000
-- **Technology**: FastAPI with EnhancedDiagnosticAgent
-- **Focus**: Structured case analysis, document processing, semantic search
-- **Interface**: React dashboard UI
-
-#### Enhanced Backend (`openwebuibase/knowledge-fusion/enhanced_backend/`)
-- **Purpose**: Conversational AI with multi-source knowledge fusion
-- **Port**: 8001  
-- **Technology**: FastAPI with KnowledgeRouter, ConversationManager, SourceFusion
-- **Focus**: Chat-based interactions, conversation context, intelligent source synthesis
-- **Interface**: OpenWebUI integration
-
-### 2. **Why Two Backends?**
-
-The dual architecture serves different but complementary purposes:
+### 🏗️ **Multi-Tier Architecture Overview**
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    IBM Knowledge Ecosystem                      │
-├─────────────────────────────────────────────────────────────────┤
+│                     User Interface Layer                        │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │              OpenWebUI (Port 8080)                         ││
+│  │            • Chat Interface                                 ││
+│  │            • Admin Panel                                    ││
+│  │            • Function Management                            ││
+│  │            • User Authentication                            ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────────┬───────────────────────────────────────┘
+                         │ Pipe Function Integration
+┌─────────────────────────▼───────────────────────────────────────┐
+│                  Knowledge Fusion Layer                        │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │        Knowledge Fusion Gateway (Port 9000)                ││
+│  │        • Intelligent Routing                               ││
+│  │        • Load Balancing                                    ││
+│  │        • Fallback Management                               ││
+│  │        • Request/Response Processing                       ││
+│  └─────────────────────────────────────────────────────────────┘│
+└─────────────────────────┬───────────────────────────────────────┘
+                         │ Smart Routing
+┌─────────────────────────▼───────────────────────────────────────┐
+│                   Processing Backends                          │
 │                                                                 │
 │  ┌─────────────────────┐        ┌─────────────────────────┐    │
-│  │  Original Backend   │        │  Enhanced Backend       │    │
-│  │  (Port 8000)        │        │  (Port 8001)            │    │
+│  │  Knowledge Fusion   │        │      CoreBackend        │    │
+│  │  Backend (8002)     │◄──────►│      (Port 8001)        │    │
 │  │                     │        │                         │    │
-│  │ • Case Management   │◄──────►│ • Conversational AI     │    │
-│  │ • Diagnostics       │        │ • Multi-source Fusion   │    │
-│  │ • Document Upload   │        │ • Chat Context          │    │
-│  │ • Semantic Search   │        │ • Source Attribution    │    │
-│  │                     │        │                         │    │
-│  │ React Dashboard UI  │        │ OpenWebUI Interface     │    │
+│  │ • Knowledge Synth   │        │ • Deep Analysis         │    │
+│  │ • Vector Search     │        │ • Case Management       │    │
+│  │ • Source Fusion     │        │ • Diagnostic Tools      │    │
+│  │ • Context Awareness │        │ • Document Processing   │    │
 │  └─────────────────────┘        └─────────────────────────┘    │
-│           │                               │                    │
-│           └───────────────┬───────────────┘                    │
-│                           │                                    │
-│                  ┌─────────▼─────────┐                         │
-│                  │ Shared Knowledge  │                         │
-│                  │ Base & Resources  │                         │
-│                  │                   │                         │
-│                  │ • knowledge_base  │                         │
-│                  │ • projectvenv     │                         │
-│                  │ • cases/          │                         │
-│                  └───────────────────┘                         │
+└─────────────────────────┬───────────────────────────────────────┘
+                         │ Data Access
+┌─────────────────────────▼───────────────────────────────────────┐
+│                    Knowledge Base Layer                        │
+│                                                                 │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌──────────────┐│
+│  │ ChromaDB    │ │ Case Data   │ │ Git Repos   │ │ Documents    ││
+│  │ (Vectors)   │ │ (Files)     │ │ (Code)      │ │ (Knowledge)  ││
+│  └─────────────┘ └─────────────┘ └─────────────┘ └──────────────┘│
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Knowledge Fusion Components
+### 🔗 **Pipe-Based Integration Model**
 
-### 1. **KnowledgeRouter Class**
-- **Intent Detection**: Analyzes user queries to determine information needs
-- **Source Selection**: Intelligently chooses which knowledge sources to query
-- **Context Understanding**: Maintains conversation context for coherent responses
-
-### 2. **ConversationManager Class**
-- **Chat History**: Maintains conversation state across multiple interactions
-- **User Context**: Tracks user preferences and conversation patterns
-- **Session Management**: Handles conversation lifecycle and metadata
-
-### 3. **SourceFusion Class**
-- **Multi-Source Intelligence**: Combines information from:
-  - Historical cases (`cases/`)
-  - GitHub code repositories
-  - Documentation sources
-  - Previous chat conversations
-  - External APIs and real-time data
-- **Confidence Scoring**: Provides reliability metrics for synthesized responses
-- **Source Attribution**: Tracks and cites information sources
-
-## OpenWebUI Integration
-
-### Why Inside OpenWebUI Project Base?
-
-The knowledge fusion system is placed within the OpenWebUI project structure for several strategic reasons:
-
-1. **Custom Function Integration**: OpenWebUI supports custom functions that extend its capabilities
-2. **Conversational Interface**: Leverages OpenWebUI's chat interface for natural interactions
-3. **Plugin Architecture**: Follows OpenWebUI's plugin pattern for modular functionality
-4. **Deployment Simplicity**: Single deployment unit with integrated custom functions
-
-### Integration Structure
-
+Unlike traditional approaches that require OpenWebUI modification, our architecture uses a **Pipe Function** for seamless integration:
 ```
-openwebuibase/
-├── knowledge-fusion/
-│   ├── enhanced_backend/           # Conversational AI backend
-│   │   └── main_enhanced.py       # FastAPI server (Port 8001)
-│   ├── functions/                 # OpenWebUI custom functions
-│   │   └── ibm_knowledge_fusion.py # Chat interface integration
-│   └── requirements.txt          # Python dependencies
+User Query → OpenWebUI Interface → Pipe Function → Gateway → Backends → Response
 ```
 
-### Custom Function (`ibm_knowledge_fusion.py`)
-- **OpenWebUI Integration**: Connects chat interface to enhanced backend
-- **IBM Styling**: Applies IBM design system and branding
-- **Response Formatting**: Formats multi-source responses for chat display
-- **Error Handling**: Manages backend communication and fallback responses
+#### **1. Pipe Function (`knowledge_fusion_function.py`)**
+- **Type**: OpenWebUI Pipe class
+- **Purpose**: Routes queries from OpenWebUI to Knowledge Fusion Gateway
+- **Features**:
+  - Real-time status updates ("🔍 Routing to Knowledge Fusion...")
+  - Error handling with user-friendly messages
+  - Configurable gateway URL and timeouts
+  - Full conversation context passing
 
-## Original Backend: The Knowledge Engine Foundation
+#### **2. Knowledge Fusion Gateway (`knowledge_fusion_gateway.py`)**
+- **Port**: 9000
+- **Purpose**: Intelligent routing and load balancing
+- **Capabilities**:
+  - Smart backend selection based on query type
+  - Graceful fallback when backends are unavailable
+  - Request/response transformation
+  - Health monitoring and circuit breaking
 
-### Technical Architecture Deep Dive
+#### **3. Processing Backends**
+- **Knowledge Fusion Backend** (8002): Advanced knowledge synthesis
+- **CoreBackend** (8001): Deep analysis and case management
+- **Intelligent Fallback**: Simulated responses when backends unavailable
 
-The original backend serves as the **sophisticated knowledge processing engine** that powers the entire system. While users interact through the conversational interface, the original backend provides the intelligence and data management capabilities.
+## 🧠 **Intelligent Routing Logic**
 
-#### 1. **EnhancedDiagnosticAgent - The AI Brain**
+### Query Classification and Routing
 
 ```python
-# Core diagnostic workflow in original backend
-class EnhancedDiagnosticAgent:
-    def diagnose_issue(self, query, session_id):
-        # Multi-step analysis process
-        result = {
-            "response": "Intelligent diagnosis response",
-            "hypotheses": [...],          # AI-generated theories
-            "similar_cases": [...],       # Pattern-matched cases
-            "similar_documents": [...],   # Semantic search results
-            "confidence": 0.85,           # Reliability score
-            "analysis": "Deep technical analysis",
-            "reasoning_trace": {...}      # AI decision process
-        }
+class QueryRouter:
+    def route_query(self, query: str) -> str:
+        if self.is_synthesis_query(query):
+            return "knowledge_fusion_backend"  # Port 8002
+        elif self.is_analysis_query(query):
+            return "core_backend"             # Port 8001
+        else:
+            return "fallback_handler"         # Intelligent simulation
 ```
 
-**Key Capabilities:**
-- **Pattern Recognition**: Identifies technical issue patterns across cases
-- **Semantic Analysis**: Uses embeddings to find conceptually similar problems
-- **Hypothesis Generation**: Creates diagnostic theories based on symptoms
-- **Confidence Assessment**: Provides reliability metrics for recommendations
+### Backend Specialization
+
+#### **Knowledge Fusion Backend (Port 8002)**
+- **Specialization**: Knowledge synthesis and fusion
+- **Use Cases**:
+  - "How do microservices communicate?"
+  - "What are best practices for debugging distributed systems?"
+  - "Explain circuit breaker patterns with examples"
+- **Capabilities**:
+  - Multi-source knowledge fusion
+  - Vector similarity search
+  - Context-aware responses
+  - Source attribution
+
+#### **CoreBackend (Port 8001)**
+- **Specialization**: Deep technical analysis
+- **Use Cases**:
+  - "Analyze this error log for root cause"
+  - "Diagnose memory leak patterns"
+  - "Compare this case with historical issues"
+- **Capabilities**:
+  - Case-based reasoning
+  - Diagnostic workflows
+  - Pattern recognition
+  - Hypothesis generation
+
+## 🔄 **Knowledge Fusion Flow**
+
+### Complete Request Lifecycle
+
+```
+1. User Input → OpenWebUI Chat Interface
+   ↓
+2. Pipe Function → Captures query + conversation context
+   ↓  
+3. Gateway (9000) → Analyzes query type + selects backend
+   ↓
+4a. Knowledge Fusion Backend (8002) → Synthesis queries
+4b. CoreBackend (8001) → Analysis queries  
+4c. Fallback Handler → When backends unavailable
+   ↓
+5. Response Processing → Source attribution + formatting
+   ↓
+6. User Response → Enhanced answer in OpenWebUI
+```
+
+### Advanced Features
+
+#### **Multi-Source Knowledge Synthesis**
+```python
+sources = {
+    "cases": query_case_database(query),
+    "docs": search_documentation(query), 
+    "code": analyze_repositories(query),
+    "conversations": find_similar_chats(query)
+}
+synthesized_response = fuse_knowledge_sources(sources)
+```
+
+#### **Graceful Degradation**
+```python
+async def handle_backend_failure():
+    try:
+        return await primary_backend.query(request)
+    except ConnectionError:
+        try:
+            return await secondary_backend.query(request)
+        except ConnectionError:
+            return intelligent_fallback_response(request)
+```
+
+## 🏗️ **Component Deep Dive**
+
+### **1. OpenWebUI Pipe Function**
+
+**Location**: `knowledge_fusion_function.py`
+**Class**: `Pipe` (not Function - critical for OpenWebUI recognition)
+
+```python
+class Pipe:
+    def __init__(self):
+        self.type = "pipe"
+        self.id = "ibm_knowledge_fusion"
+        self.name = "IBM Knowledge Fusion"
+        
+    async def pipe(self, body, __user__, __request__, __event_emitter__):
+        # Routes to Knowledge Fusion Gateway
+        # Provides real-time UI feedback
+        # Handles errors gracefully
+```
+
+### **2. Knowledge Fusion Gateway**
+
+**Location**: `knowledge_fusion_gateway.py`
+**Purpose**: Central routing and orchestration
+
+```python
+@app.post("/knowledge-fusion/query")
+async def query_handler(request: QueryRequest):
+    # 1. Analyze query characteristics
+    backend = determine_optimal_backend(request.query)
+    
+    # 2. Route to appropriate backend
+    response = await route_to_backend(backend, request)
+    
+    # 3. Handle fallbacks if needed
+    if not response:
+        response = await intelligent_fallback(request)
+        
+    return response
+```
+
+### **3. Knowledge Fusion Backend**
+
+**Location**: `knowledge-fusion-template/start_server.py`
+**Specialization**: Knowledge synthesis and multi-source fusion
+
+```python
+class KnowledgeFusionServer:
+    async def synthesize_knowledge(self, query: str):
+        # Multi-source information gathering
+        # Vector similarity search
+        # Context-aware response generation
+        # Source attribution and confidence scoring
+```
+
+### **4. CoreBackend** 
+
+**Location**: `corebackend/implementation/backend/main.py`
+**Specialization**: Deep analysis and case management
+
+```python
+class CoreBackendAPI:
+    async def analyze_case(self, query: str):
+        # Pattern recognition across historical cases
+        # Diagnostic hypothesis generation  
+        # Root cause analysis
+        # Confidence assessment
+```
+
+## 🎯 **What Makes This Architecture Different**
+
+### Traditional RAG Limitations
+```
+Query → Document Search → Generate Response
+```
+- Single knowledge source
+- No intelligent routing
+- Brittle failure modes
+- Limited context awareness
+
+### Knowledge Fusion Advantages
+```
+Query → Intelligent Analysis → Multi-Backend Synthesis → Enhanced Response
+```
+- **Multi-Source Intelligence**: Cases + Docs + Code + Conversations
+- **Adaptive Routing**: Query-specific backend selection
+- **Graceful Degradation**: Intelligent fallbacks maintain service
+- **Decoupled Integration**: No OpenWebUI modification required
+- **Enterprise Scalability**: Designed for corporate environments
+
+## 🚀 **Deployment Architecture**
+
+### Development Mode (Server Mode)
+```bash
+./bin/start_server_mode.sh
+```
+- Direct Python execution
+- Easy debugging and development
+- Corporate network friendly
+- Fast iteration cycles
+
+### Production Mode (Container Mode)  
+```bash
+./start_docker_mode.sh
+```
+- Containerized services
+- Scalable deployment
+- Production hardening
+- Environment isolation
+
+### Service Dependencies
+```
+Prerequisites: OpenWebUI running (any port)
+├── CoreBackend (8001) ← Case analysis and diagnostics
+├── Knowledge Fusion Backend (8002) ← Knowledge synthesis  
+├── Knowledge Fusion Gateway (9000) ← Intelligent routing
+└── OpenWebUI Integration ← Pipe function upload
+```
 - **Session Continuity**: Maintains diagnostic context across multiple queries
 
 #### 2. **Structured Case Management System**
