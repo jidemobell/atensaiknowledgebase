@@ -5,19 +5,18 @@
 ## 🚀 Super Quick Start (5 minutes)
 
 ```bash
-# 1. Setup (one-time)
-./setup_ibm.sh          # or ./setup.sh for non-IBM
-
-# 2. Start services  
+# 1. Start Knowledge Fusion services
 ./bin/start_server_mode.sh
 
-# 3. Check status
-./status_ibm.sh
+# 2. Install OpenWebUI separately (if not already installed)
+pip install open-webui
+open-webui serve --port 8080
 
-# 4. Get function code
+# 3. Get function code
 cat knowledge_fusion_function.py
 
-# 5. Upload to OpenWebUI Admin → Functions
+# 4. Upload to OpenWebUI Admin → Functions → Create Function
+# 5. Enable the function in OpenWebUI
 # 6. Test in chat: "How do I debug memory leaks in microservices?"
 ```
 
@@ -36,7 +35,7 @@ Port 8080: OpenWebUI (external)           ← Your existing UI
 📁 knowledge_fusion_function.py → Uploaded to OpenWebUI
 🔧 Function enabled in OpenWebUI Admin Panel
 🔗 Gateway accessible from OpenWebUI environment
-📊 Logs accessible via ./view_logs.sh
+📊 Logs accessible via ./bin/view_logs.sh
 ```
 
 ### ✅ Data Structure
@@ -131,14 +130,17 @@ ln -s /path/to/your/docs data/cases/documentation
 
 ### Real-time Logs
 ```bash
-./view_logs.sh              # All logs in terminal
-python web_logs.py          # Web interface at :8005
+./bin/view_logs.sh          # Advanced monitoring with service health checks
+tail -f logs/knowledge_fusion.log  # Basic log monitoring
 ```
 
 ### Health Checks
 ```bash
-./status_ibm.sh            # Full system status
-curl localhost:9000/health # Gateway health
+# Check all services status
+curl localhost:9000/health  # Gateway health
+curl localhost:8001/health  # Core Backend health  
+curl localhost:8002/health  # Knowledge Fusion Backend health
+curl localhost:8080/health  # OpenWebUI health
 ```
 
 ### Testing Integration
@@ -220,205 +222,128 @@ tail -f logs/knowledge_fusion.log
 
 **The bottom line**: You now have a knowledge synthesis platform that goes beyond simple retrieval-generation to provide intelligent, adaptive, multi-source knowledge fusion. 
 
-Ready to transform how your team accesses and synthesizes knowledge? Start with `./setup_ibm.sh` and follow this guide!
+Ready to transform how your team accesses and synthesizes knowledge? Start with `./bin/start_server_mode.sh` and follow this guide!
 
-### ✅ Working Components:
-- **OpenWebUI Frontend**: Svelte-based production interface
-- **Novel Knowledge Fusion Engine**: Advanced temporal synthesis (Port 8003)
-- **Multi-Agent Backend**: Research and synthesis capabilities (Port 8001)
-- **Basic Service**: Health monitoring and simple queries (Port 8000)
-
-### 🔄 Mock/Demo Components:
-- **AI Models**: Currently using simulated responses
-- **Knowledge Integration**: Mock synthesis engines
-- **Data Sources**: Placeholder implementations
-
-### 🎯 Production Ready Features:
-- Real-time temporal knowledge synthesis
-- Multi-source data fusion framework
-- Predictive analytics engine
-- Dynamic knowledge evolution
-- Confidence-weighted responses
-
-## 🚀 Quick Start Guide
+## 🚀 Complete Setup Guide
 
 ### Prerequisites
 ```bash
 # System Requirements
 - Python 3.8+
-- Node.js 16+ (for OpenWebUI frontend)
-- Docker (optional, for containerized deployment)
 - Git
-- 8GB+ RAM recommended
+- 4GB+ RAM recommended
+- OpenWebUI (can be installed separately)
 ```
 
-### 1. Clone and Setup
+### 1. Start Knowledge Fusion Platform
 ```bash
-# Clone the repository
-cd /your/workspace/directory
-git clone <your-repo-url>
-cd TOPOLOGYKNOWLEDGE
-
-# Create Python virtual environment
-python3 -m venv projectvenv
-source projectvenv/bin/activate  # On Windows: projectvenv\Scripts\activate
-
-# Install Python dependencies
-pip install fastapi uvicorn aiohttp jinja2 pydantic pytest
+# Start all services in one command
+./bin/start_server_mode.sh
 ```
 
-### 2. Start Backend Services
+This script will:
+- ✅ Set up Python virtual environment (`openwebui_venv/`)
+- ✅ Install required dependencies
+- ✅ Start Core Backend (Port 8001)
+- ✅ Start Knowledge Fusion Backend (Port 8002) 
+- ✅ Start Knowledge Fusion Gateway (Port 9000)
+- ✅ Configure ChromaDB vector database
 
-#### Option A: Start Novel Fusion Engine (Recommended)
+### 2. Install OpenWebUI (if not already installed)
 ```bash
-# Terminal 1: Novel Knowledge Fusion Platform (Port 8003)
-cd openwebuibase/knowledge-fusion/enhanced_backend
-python main_novel_architecture.py
+# Install OpenWebUI separately
+pip install open-webui
+open-webui serve --port 8080
 ```
 
-#### Option B: Start Multi-Agent System
+### 3. Upload Function to OpenWebUI
+1. Open OpenWebUI at `http://localhost:8080`
+2. Go to **Admin Panel → Functions**
+3. Click **Create Function**
+4. Copy content from `knowledge_fusion_function.py`
+5. Paste and save the function
+6. **Enable** the function in your settings
+
+### 4. Verify Services
 ```bash
-# Terminal 2: Enhanced Multi-Agent Backend (Port 8001)
-cd openwebuibase/knowledge-fusion/enhanced_backend  
-python main_multi_agent.py
+# Check all services are running
+curl http://localhost:8001/health  # Core Backend
+curl http://localhost:8002/health  # Knowledge Fusion Backend  
+curl http://localhost:9000/health  # Gateway
+curl http://localhost:8080/health  # OpenWebUI
 ```
 
-#### Option C: Start Basic Service
+## 📊 Testing the System
+
+### Basic Test
+Ask in OpenWebUI chat: *"What are microservices best practices?"*
+
+### Advanced Test  
 ```bash
-# Terminal 3: Basic Health/Query Service (Port 8000)
-cd qwenroute/implementation/backend
-python main_minimal.py
-```
-
-### 3. Start Frontend Interface
-```bash
-# Terminal 4: OpenWebUI Frontend (Port 8080)
-cd openwebuibase
-npm install
-npm run dev
-```
-
-### 4. Verify Installation
-```bash
-# Check backend services
-curl http://localhost:8003/health    # Novel Fusion Engine
-curl http://localhost:8001/health    # Multi-Agent System  
-curl http://localhost:8000/health    # Basic Service
-
-# Access web interface
-open http://localhost:8080
-```
-
-## 🧪 Demo the System
-
-### 1. Basic Query Test
-```bash
-curl -X POST http://localhost:8003/query \
+# Direct API test
+curl -X POST http://localhost:9000/query \
   -H "Content-Type: application/json" \
-  -d '{"query": "What are the current trends in microservices architecture?"}'
+  -d '{"query": "How do I debug memory leaks in containerized applications?"}'
 ```
 
-### 2. Temporal Analysis Test
+## 🔧 Platform Management
+
+### View Logs and Monitor
 ```bash
-curl -X POST http://localhost:8003/analyze \
-  -H "Content-Type: application/json" \
-  -d '{"query": "topology-merge service performance over time", "enable_temporal": true}'
+./bin/view_logs.sh          # Advanced monitoring dashboard
+tail -f logs/knowledge_fusion.log  # Basic log viewing
 ```
 
-### 3. Knowledge Fusion Test
+### Add Knowledge Sources
 ```bash
-curl -X POST http://localhost:8003/synthesize \
-  -H "Content-Type: application/json" \
-  -d '{"sources": ["github", "docs", "cases"], "query": "debugging containerization issues"}'
+./bin/add_knowledge_source.sh      # Add GitHub repositories
+./bin/manage_hybrid_sources.sh     # Add web, API, database sources
 ```
 
-### 4. Multi-Agent Research Test  
+### Automated Updates
 ```bash
-curl -X POST http://localhost:8001/research \
-  -H "Content-Type: application/json" \
-  -d '{"query": "best practices for Kubernetes troubleshooting", "depth": "comprehensive"}'
+./bin/automated_scheduler.sh       # Set up automatic updates
 ```
 
-## 📊 Expected Demo Outputs
-
-### Novel Fusion Engine Response:
-```json
-{
-  "response": "Based on temporal analysis of microservices patterns...",
-  "confidence": 0.85,
-  "temporal_insights": {
-    "historical_trends": "...",
-    "current_state": "...", 
-    "predictions": "..."
-  },
-  "sources_fusion": {
-    "github_patterns": "...",
-    "case_insights": "...",
-    "documentation_synthesis": "..."
-  }
-}
+### Platform Demo
+```bash
+./bin/demo_platform.sh            # Comprehensive platform demonstration
 ```
-
-### Multi-Agent Research Response:
-```json
-{
-  "research_plan": {
-    "steps": [
-      {"agent": "researcher", "action": "gather_sources"},
-      {"agent": "analyzer", "action": "pattern_analysis"},
-      {"agent": "synthesizer", "action": "generate_insights"}
-    ]
-  },
-  "findings": "...",
-  "confidence": 0.92
-}
-```
-
-## 🔄 Next Steps: Model Integration
-
-The current system uses **mock responses** for demonstration. See the following guides for production deployment:
-
-1. **[Model Integration Guide](./MODEL_INTEGRATION.md)** - Adding real AI models
-2. **[OpenWebUI Setup Guide](./OPENWEBUI_SETUP.md)** - Model management through OpenWebUI
-3. **[Docker Deployment Guide](./DOCKER_DEPLOYMENT.md)** - Containerized deployment
-4. **[Migration Guide](./MIGRATION_GUIDE.md)** - Moving to production environment
 
 ## 🐛 Troubleshooting
 
-### Port Conflicts
+### Services Won't Start
 ```bash
-# Kill processes on ports
-lsof -ti:8000 | xargs kill -9
-lsof -ti:8001 | xargs kill -9  
-lsof -ti:8003 | xargs kill -9
-lsof -ti:8080 | xargs kill -9
+# Check for port conflicts
+lsof -i :8001,8002,9000,8080
+
+# Restart services
+pkill -f "knowledge_fusion\|uvicorn"
+./bin/start_server_mode.sh
 ```
 
-### Missing Dependencies
-```bash
-# Reinstall Python packages
-pip install -r requirements.txt
+### Function Won't Upload
+- Ensure OpenWebUI is running on port 8080
+- Copy the entire content of `knowledge_fusion_function.py`
+- Don't upload as a ZIP file, paste the code directly
+- Enable the function after saving
 
-# Reinstall Node packages
-cd openwebuibase && npm install
+### Connection Issues
+```bash
+# Test Knowledge Fusion Gateway
+curl http://localhost:9000/health
+
+# Check OpenWebUI connection
+curl http://localhost:8080/health
 ```
 
-### Service Not Starting
-```bash
-# Check Python environment
-which python
-pip list | grep fastapi
+## 📚 Additional Resources
 
-# Check logs
-python main_novel_architecture.py --verbose
-```
-
-## 📚 Related Documentation
-
-- **[Architecture Overview](./KNOWLEDGE_FUSION_ARCHITECTURE.md)**
-- **[Research Foundation](./qwenroute/plan/RESEARCH_PAPERS.md)** 
-- **[Project Vision](./PROJECT_VISION.md)**
-- **[Advanced Features](./ADVANCED_ARCHITECTURE.md)**
+- **[Integration Flow Guide](INTEGRATION_FLOW.md)** - Detailed setup instructions
+- **[Architecture Overview](KNOWLEDGE_FUSION_ARCHITECTURE.md)** - System design
+- **[AI Agent Architecture](AI_AGENT_ARCHITECTURE.md)** - Multi-agent system details
+- **[Platform Status](PLATFORM_COMPLETION_SUMMARY.md)** - Current capabilities
+- **[Scripts Documentation](../bin/README.md)** - All available tools
 
 ---
 
