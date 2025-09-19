@@ -2,6 +2,8 @@
 
 **Beyond Basic RAG** - A next-generation knowledge integration platform that provides intelligent routing, multi-source synthesis, and advanced AI capabilities through seamless integration with OpenWebUI.
 
+> 🎯 **Recently Organized**: Platform now features clean architecture with all scripts in `bin/`, comprehensive documentation in `docs/`, and streamlined setup process.
+
 ## Quick Start (5 minutes)
 
 ```bash
@@ -171,10 +173,13 @@ curl -X POST http://localhost:9000/synthesize \
 **Services won't start**:
 ```bash
 # Check logs
-tail -f logs/knowledge_fusion.log
+./bin/view_logs.sh
 
 # Verify ports
-netstat -an | grep -E "(8001|8002|9000|11434)"
+lsof -i :8001,8002,9000,8080
+
+# Restart services  
+./bin/start_server_mode.sh
 ```
 
 **OpenWebUI connection issues**:
