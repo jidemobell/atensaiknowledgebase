@@ -364,10 +364,21 @@ else
     exit 1
 fi
 
-start_service "Core Backend" \
-    "python -m uvicorn main:app --host 0.0.0.0 --port $CORE_BACKEND_PORT" \
-    "$(dirname "$CORE_BACKEND_MAIN")" \
-    $CORE_BACKEND_PORT
+# Start Core Backend using isolated environment
+echo -e "\n${BLUE}🔄 Starting Core Backend (Isolated Environment)...${NC}"
+if [ -f "$PROJECT_ROOT/bin/run_corebackend_isolated.sh" ]; then
+    echo "  Using isolated virtual environment for Core Backend"
+    cd "$PROJECT_ROOT"
+    ./bin/run_corebackend_isolated.sh &
+    CORE_BACKEND_PID=$!
+    echo "$CORE_BACKEND_PID" >> "$PID_FILE"
+else
+    echo -e "${YELLOW}⚠️  Isolated Core Backend script not found, falling back to standard method${NC}"
+    start_service "Core Backend" \
+        "python -m uvicorn main:app --host 0.0.0.0 --port $CORE_BACKEND_PORT" \
+        "$(dirname "$CORE_BACKEND_MAIN")" \
+        $CORE_BACKEND_PORT
+fi
 
 if ! wait_for_service "http://localhost:$CORE_BACKEND_PORT/health" "Core Backend"; then
     echo -e "${RED}❌ Core Backend failed to start${NC}"

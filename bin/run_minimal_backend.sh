@@ -1,3 +1,51 @@
+#!/bin/bash
+
+# =============================================================================
+# MINIMAL CORE BACKEND RUNNER
+# =============================================================================
+# Run a minimal Core Backend without ML dependencies for API testing
+# =============================================================================
+
+set -euo pipefail
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BACKEND_DIR="$PROJECT_ROOT/corebackend/implementation/backend"
+VENV_PATH="$PROJECT_ROOT/openwebui_venv"
+TEMP_MAIN="$BACKEND_DIR/main_minimal.py"
+
+echo -e "${BLUE}🚀 Starting Minimal Core Backend${NC}"
+echo -e "${BLUE}=================================${NC}"
+echo ""
+
+# Check prerequisites
+if [ ! -d "$VENV_PATH" ]; then
+    echo -e "${RED}❌ Virtual environment not found: $VENV_PATH${NC}"
+    exit 1
+fi
+
+if [ ! -d "$BACKEND_DIR" ]; then
+    echo -e "${RED}❌ Backend directory not found: $BACKEND_DIR${NC}"
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Found backend directory${NC}"
+
+# Kill any existing processes on port 8001
+echo -e "${YELLOW}🔄 Cleaning up existing processes on port 8001...${NC}"
+pkill -f "uvicorn.*main.*8001" 2>/dev/null || true
+lsof -ti:8001 | xargs kill -9 2>/dev/null || true
+sleep 2
+
+# Create minimal main.py
+echo -e "${BLUE}📝 Creating minimal Core Backend...${NC}"
+cat > "$TEMP_MAIN" << 'EOF'
 """
 Minimal FastAPI Backend for Testing API Structure
 """
@@ -161,3 +209,21 @@ async def advanced_search(query: str):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)
+EOF
+
+echo -e "${GREEN}✅ Created minimal backend${NC}"
+
+# Change to backend directory and activate venv
+cd "$BACKEND_DIR"
+source "$VENV_PATH/bin/activate"
+
+echo -e "${BLUE}🚀 Starting minimal Core Backend on port 8001...${NC}"
+echo -e "${BLUE}   Access at: http://localhost:8001${NC}"
+echo -e "${BLUE}   API docs: http://localhost:8001/docs${NC}"
+echo -e "${BLUE}   OpenAPI:  http://localhost:8001/openapi.json${NC}"
+echo ""
+echo -e "${YELLOW}Press Ctrl+C to stop${NC}"
+echo ""
+
+# Start the minimal backend
+exec python main_minimal.py
