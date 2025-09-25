@@ -6,82 +6,8 @@
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
+BLUE='\033[0;34m'
 NC='\033[0m'
-
-echo -e "${GREEN}🔑 GitHub Authentication Setup for Knowledge Fusion Platform${NC}"
-echo "============================================================"
-
-echo "This script supports two authentication methods:"
-echo "1. 🔑 Personal Access Token (if available)"
-echo "2. 🔐 SSH Authentication (enterprise-friendly)"
-echo ""
-
-# Check if token is already set
-if [ -n "$GITHUB_TOKEN" ]; then
-    echo -e "${GREEN}✅ GITHUB_TOKEN is already set${NC}"
-    echo "   Token preview: ${GITHUB_TOKEN:0:8}..."
-    echo ""
-else
-    echo -e "${YELLOW}⚠️  GITHUB_TOKEN is not set${NC}"
-    echo ""
-    echo "🏢 Enterprise GitHub Note:"
-    echo "If your organization doesn't allow personal tokens, we'll set up SSH instead."
-    echo ""
-    echo ""
-fi
-
-echo "📋 To set up your GitHub token:"
-echo ""
-echo "1️⃣  Get your token from GitHub:"
-echo "   🔗 https://github.com/settings/tokens"
-echo ""
-echo "2️⃣  Set the environment variable:"
-echo "   For current session:"
-echo "   export GITHUB_TOKEN=\"your_token_here\""
-echo ""
-echo "   For permanent setup (add to ~/.zshrc or ~/.bashrc):"
-echo "   echo 'export GITHUB_TOKEN=\"your_token_here\"' >> ~/.zshrc"
-echo "   source ~/.zshrc"
-echo ""
-echo "3️⃣  Required token permissions:"
-echo "   ✅ repo (Full repository access)"
-echo "   ✅ public_repo (Public repository access)"
-echo "   ✅ read:org (Read organization membership)"
-echo ""
-echo "4️⃣  Test your setup:"
-echo "   ./bin/test_github_token.sh"
-echo ""
-
-# Offer to help set the token
-echo -e "${YELLOW}💡 Would you like to set the token now? (y/n)${NC}"
-read -r response
-
-if [[ "$response" =~ ^[Yy]$ ]]; then
-    echo "Please enter your GitHub token:"
-    read -s token
-    
-    if [ -n "$token" ]; then
-        export GITHUB_TOKEN="$token"
-        echo -e "${GREEN}✅ Token set for current session${NC}"
-        echo ""
-        echo "To make this permanent, add this line to your shell config:"
-        echo "export GITHUB_TOKEN=\"$token\""
-        
-        # Test the token
-        echo ""
-        echo "🧪 Testing token..."
-        if curl -s -H "Authorization: token $token" https://api.github.com/user > /dev/null 2>&1; then
-            echo -e "${GREEN}✅ Token is valid!${NC}"
-        else
-            echo -e "${RED}❌ Token test failed. Please check your token.${NC}"
-        fi
-    else
-        echo -e "${RED}❌ No token provided${NC}"
-        echo ""
-        echo -e "${BLUE}🔐 Setting up SSH authentication instead...${NC}"
-        setup_ssh_auth
-    fi
-fi
 
 # SSH Authentication Setup Function
 setup_ssh_auth() {
@@ -149,3 +75,105 @@ setup_ssh_auth() {
     echo "• The platform will automatically use SSH URLs for cloning"
     echo "• Repository URLs will be converted: https://github.com/user/repo → git@github.com:user/repo"
 }
+
+echo -e "${GREEN}🔑 GitHub Authentication Setup for Knowledge Fusion Platform${NC}"
+echo "============================================================"
+
+echo "This script supports two authentication methods:"
+echo "1. 🔑 Personal Access Token (if available)"
+echo "2. 🔐 SSH Authentication (enterprise-friendly)"
+echo ""
+
+# Check if token is already set
+if [ -n "$GITHUB_TOKEN" ]; then
+    echo -e "${GREEN}✅ GITHUB_TOKEN is already set${NC}"
+    echo "   Token preview: ${GITHUB_TOKEN:0:8}..."
+    echo ""
+else
+    echo -e "${YELLOW}⚠️  GITHUB_TOKEN is not set${NC}"
+    echo ""
+    echo "🏢 Enterprise GitHub Note:"
+    echo "If your organization doesn't allow personal tokens, we'll set up SSH instead."
+    echo ""
+    echo ""
+fi
+
+echo "📋 To set up your GitHub token:"
+echo ""
+echo "1️⃣  Get your token from GitHub:"
+echo "   🔗 https://github.com/settings/tokens"
+echo ""
+echo "2️⃣  Set the environment variable:"
+echo "   For current session:"
+echo "   export GITHUB_TOKEN=\"your_token_here\""
+echo ""
+echo "   For permanent setup (add to ~/.zshrc or ~/.bashrc):"
+echo "   echo 'export GITHUB_TOKEN=\"your_token_here\"' >> ~/.zshrc"
+echo "   source ~/.zshrc"
+echo ""
+echo "3️⃣  Required token permissions:"
+echo "   ✅ repo (Full repository access)"
+echo "   ✅ public_repo (Public repository access)"
+echo "   ✅ read:org (Read organization membership)"
+echo ""
+echo "4️⃣  Test your setup:"
+echo "   ./bin/test_github_token.sh"
+echo ""
+
+# Offer authentication options
+echo -e "${YELLOW}💡 Choose your GitHub authentication method:${NC}"
+echo "1) 🔑 Personal Access Token (if available)"
+echo "2) 🔐 SSH Authentication (enterprise-friendly, no token needed)"
+echo "3) ❌ Skip setup"
+echo ""
+echo -n "Enter your choice (1/2/3): "
+read -r choice
+
+case $choice in
+    1)
+        echo ""
+        echo "📝 Setting up GitHub Personal Access Token..."
+        echo "Please enter your GitHub token:"
+        read -s token
+        
+        if [ -n "$token" ]; then
+            export GITHUB_TOKEN="$token"
+            echo -e "${GREEN}✅ Token set for current session${NC}"
+            echo ""
+            echo "To make this permanent, add this line to your shell config:"
+            echo "export GITHUB_TOKEN=\"$token\""
+            
+            # Test the token
+            echo ""
+            echo "🧪 Testing token..."
+            if curl -s -H "Authorization: token $token" https://api.github.com/user > /dev/null 2>&1; then
+                echo -e "${GREEN}✅ Token is valid!${NC}"
+            else
+                echo -e "${RED}❌ Token test failed. Please check your token.${NC}"
+                echo ""
+                echo -e "${BLUE}🔐 Falling back to SSH authentication...${NC}"
+                setup_ssh_auth
+            fi
+        else
+            echo -e "${RED}❌ No token provided${NC}"
+            echo ""
+            echo -e "${BLUE}🔐 Setting up SSH authentication instead...${NC}"
+            setup_ssh_auth
+        fi
+        ;;
+    2)
+        echo ""
+        echo -e "${BLUE}🔐 Setting up SSH authentication...${NC}"
+        setup_ssh_auth
+        ;;
+    3)
+        echo ""
+        echo -e "${YELLOW}⚠️  Setup skipped. GitHub features may not work without authentication.${NC}"
+        exit 0
+        ;;
+    *)
+        echo ""
+        echo -e "${RED}❌ Invalid choice. Defaulting to SSH authentication...${NC}"
+        setup_ssh_auth
+        ;;
+esac
