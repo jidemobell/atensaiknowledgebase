@@ -7,16 +7,24 @@
 ## Quick Start (5 minutes)
 
 ```bash
-# 1. Start Knowledge Fusion services
+# 1. Setup virtual environments (auto-creates if missing)
+./bin/setup_environments.sh
+
+# 2. Setup GitHub authentication (SSH or token)
+./bin/setup_github_token.sh
+
+# 3. Start Knowledge Fusion services
 ./bin/start_server_mode.sh
 
-# 2. Install OpenWebUI separately  
+# 4. Install OpenWebUI separately  
 pip install open-webui
 open-webui serve --port 8080
 
-# 3. Upload knowledge_fusion_function.py to OpenWebUI Admin Panel → Functions
-# 4. Start chatting with enhanced AI capabilities!
+# 5. Upload knowledge_fusion_function.py to OpenWebUI Admin Panel → Functions
+# 6. Start chatting with enhanced AI capabilities!
 ```
+
+> 📚 **Need detailed instructions?** See [`docs/COMPLETE_DOCUMENTATION.md`](docs/COMPLETE_DOCUMENTATION.md) for comprehensive script reference, troubleshooting, and advanced usage.
 
 ## Architecture Overview
 
