@@ -167,10 +167,24 @@ async def get_case(case_id: str):
     
     return case
 
-# Code Knowledge Endpoints
+# ASM Repository Endpoints
+@app.post("/api/asm/load-repositories")
+async def load_asm_repositories(asm_repos_dir: str = "data/asm_repositories"):
+    """Load and analyze all ASM repositories from local directory"""
+    
+    if ENHANCED_MODE:
+        try:
+            result = await knowledge_manager.load_asm_repositories(asm_repos_dir)
+            return {"status": "success", "analysis_result": result}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error loading ASM repositories: {str(e)}")
+    else:
+        return {"status": "error", "message": "ASM repository loading requires enhanced mode"}
+
+# Code Knowledge Endpoints (Updated for local files)
 @app.post("/api/code/add")
 async def add_code_knowledge(request: CodeEntryRequest):
-    """Add code knowledge from GitHub or other sources"""
+    """Add code knowledge from local repository sources"""
     
     if ENHANCED_MODE:
         try:

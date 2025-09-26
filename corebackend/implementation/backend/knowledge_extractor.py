@@ -1,5 +1,6 @@
 import re
 import json
+import logging
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from models import ExtractedKnowledge, KnowledgeSourceType
@@ -83,8 +84,59 @@ class KnowledgeExtractor:
             suggested_case_type="incident"
         )
 
-    def extract_from_github_code(self, code_content: str, file_path: str) -> Dict[str, Any]:
-        """Extract knowledge from GitHub code snippets"""
+    def extract_from_asm_repository(self, repo_path: str, domain: str = None) -> Dict[str, Any]:
+        """Extract knowledge from local ASM repository"""
+        import os
+        from pathlib import Path
+        
+        repo_path = Path(repo_path)
+        if not repo_path.exists():
+            return {'error': f'Repository path does not exist: {repo_path}'}
+        
+        extracted_data = {
+            'repository_path': str(repo_path),
+            'domain': domain or 'general',
+            'files_analyzed': 0,
+            'languages': [],
+            'functions': [],
+            'error_patterns': [],
+            'config_references': [],
+            'dependencies': [],
+            'services': [],
+            'patterns': {}
+        }
+        
+        # Analyze all relevant files in the repository
+        for file_path in repo_path.rglob("*"):
+            if file_path.is_file() and self._is_analyzable_file(file_path):
+                try:
+                    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                        content = f.read()
+                    
+                    # Extract knowledge from file content
+                    file_analysis = self.extract_from_code_file(content, str(file_path.relative_to(repo_path)))
+                    
+                    # Merge results
+                    extracted_data['files_analyzed'] += 1
+                    if file_analysis.get('language') and file_analysis['language'] not in extracted_data['languages']:
+                        extracted_data['languages'].append(file_analysis['language'])
+                    
+                    extracted_data['functions'].extend(file_analysis.get('functions', []))
+                    extracted_data['error_patterns'].extend(file_analysis.get('error_patterns', []))
+                    extracted_data['config_references'].extend(file_analysis.get('config_references', []))
+                    extracted_data['dependencies'].extend(file_analysis.get('dependencies', []))
+                    extracted_data['services'].extend(file_analysis.get('services', []))
+                    
+                except Exception as e:
+                    logging.warning(f"Error analyzing file {file_path}: {e}")
+        
+        # Detect ASM-specific patterns based on domain
+        extracted_data['patterns'] = self._detect_asm_patterns(extracted_data, domain)
+        
+        return extracted_data
+    
+    def extract_from_code_file(self, code_content: str, file_path: str) -> Dict[str, Any]:
+        """Extract knowledge from code file content (renamed from extract_from_github_code)"""
         
         # Detect programming language
         language = self._detect_language(file_path)
@@ -488,3 +540,100 @@ class KnowledgeExtractor:
             tags.append('category:deployment')
         
         return tags
+    
+    def _is_analyzable_file(self, file_path) -> bool:
+        """Check if file should be analyzed for knowledge extraction"""
+        analyzable_extensions = {
+            '.py', '.java', '.js', '.ts', '.go', '.rs', '.cpp', '.c', '.h',
+            '.yaml', '.yml', '.json', '.xml', '.properties', '.conf', '.cfg',
+            '.md', '.txt', '.rst', '.sql', '.sh', '.bash', '.ps1',
+            '.dockerfile', '.docker', 'Dockerfile', 'Makefile'
+        }
+        
+        # Check extension
+        if file_path.suffix.lower() in analyzable_extensions:
+            return True
+        
+        # Check specific filenames
+        if file_path.name in ['Dockerfile', 'Makefile', 'README', 'CHANGELOG']:
+            return True
+        
+        return False
+    
+    def _detect_asm_patterns(self, data: Dict[str, Any], domain: str = None) -> Dict[str, Any]:
+        """Detect ASM-specific patterns in the extracted data"""
+        patterns = {
+            'architecture_patterns': [],
+            'integration_patterns': [],
+            'operational_patterns': [],
+            'domain_specific': []
+        }
+        
+        # Architecture patterns
+        if 'microservice' in ' '.join(data.get('services', [])).lower():
+            patterns['architecture_patterns'].append('microservices_architecture')
+        
+        if any('kafka' in dep.lower() for dep in data.get('dependencies', [])):
+            patterns['architecture_patterns'].append('event_driven_architecture')
+        
+        # Integration patterns
+        if any('rest' in func.lower() or 'api' in func.lower() for func in data.get('functions', [])):
+            patterns['integration_patterns'].append('rest_api_integration')
+        
+        # Operational patterns
+        if any('health' in func.lower() or 'status' in func.lower() for func in data.get('functions', [])):
+            patterns['operational_patterns'].append('health_monitoring')
+        
+        # Domain-specific patterns based on domain
+        if domain:
+            if domain == 'topology':
+                patterns['domain_specific'].extend(self._detect_topology_patterns(data))
+            elif domain == 'observers':
+                patterns['domain_specific'].extend(self._detect_observer_patterns(data))
+            elif domain == 'ui':
+                patterns['domain_specific'].extend(self._detect_ui_patterns(data))
+        
+        return patterns
+    
+    def _detect_topology_patterns(self, data: Dict[str, Any]) -> List[str]:
+        """Detect topology-specific patterns"""
+        patterns = []
+        functions = ' '.join(data.get('functions', [])).lower()
+        
+        if 'merge' in functions:
+            patterns.append('topology_merge_pattern')
+        if 'inventory' in functions:
+            patterns.append('inventory_management_pattern')
+        if 'sync' in functions:
+            patterns.append('synchronization_pattern')
+        
+        return patterns
+    
+    def _detect_observer_patterns(self, data: Dict[str, Any]) -> List[str]:
+        """Detect observer-specific patterns"""
+        patterns = []
+        functions = ' '.join(data.get('functions', [])).lower()
+        
+        if 'observe' in functions or 'watch' in functions:
+            patterns.append('observer_pattern')
+        if 'event' in functions:
+            patterns.append('event_handling_pattern')
+        if 'poll' in functions:
+            patterns.append('polling_pattern')
+        
+        return patterns
+    
+    def _detect_ui_patterns(self, data: Dict[str, Any]) -> List[str]:
+        """Detect UI-specific patterns"""
+        patterns = []
+        functions = ' '.join(data.get('functions', [])).lower()
+        languages = data.get('languages', [])
+        
+        if 'react' in ' '.join(languages).lower():
+            patterns.append('react_component_pattern')
+        if 'component' in functions:
+            patterns.append('ui_component_pattern')
+        if 'render' in functions:
+            patterns.append('rendering_pattern')
+        
+        return patterns

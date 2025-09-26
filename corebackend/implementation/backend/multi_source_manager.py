@@ -66,10 +66,10 @@ class MultiSourceKnowledgeManager:
 
     async def add_code_knowledge(self, repo: str, file_path: str, 
                                code_content: str, commit_info: Dict = None) -> Dict[str, Any]:
-        """Add code knowledge from GitHub or other sources"""
+        """Add code knowledge from local repository sources"""
         
-        # Extract code intelligence
-        extracted = self.extractor.extract_from_github_code(code_content, file_path)
+        # Extract code intelligence using the new method
+        extracted = self.extractor.extract_from_code_file(code_content, file_path)
         
         code_entry = {
             'id': str(uuid.uuid4()),
@@ -89,6 +89,60 @@ class MultiSourceKnowledgeManager:
         
         self.knowledge_store['code'].append(code_entry)
         return code_entry
+
+    async def load_asm_repositories(self, asm_repos_dir: str = "data/asm_repositories") -> Dict[str, Any]:
+        """Load and analyze all ASM repositories from local directory"""
+        import os
+        from pathlib import Path
+        
+        asm_path = Path(asm_repos_dir)
+        if not asm_path.exists():
+            return {'error': f'ASM repositories directory not found: {asm_repos_dir}'}
+        
+        results = {
+            'repositories_processed': 0,
+            'total_files_analyzed': 0,
+            'domains_found': [],
+            'patterns_detected': {},
+            'errors': []
+        }
+        
+        # Process each domain directory
+        for domain_dir in asm_path.iterdir():
+            if domain_dir.is_dir():
+                domain = domain_dir.name
+                results['domains_found'].append(domain)
+                
+                try:
+                    # Extract knowledge from the entire domain repository
+                    extracted = self.extractor.extract_from_asm_repository(str(domain_dir), domain)
+                    
+                    if 'error' not in extracted:
+                        results['repositories_processed'] += 1
+                        results['total_files_analyzed'] += extracted.get('files_analyzed', 0)
+                        results['patterns_detected'][domain] = extracted.get('patterns', {})
+                        
+                        # Store the extracted knowledge
+                        asm_entry = {
+                            'id': str(uuid.uuid4()),
+                            'domain': domain,
+                            'repository_path': str(domain_dir),
+                            'analysis_data': extracted,
+                            'created_date': datetime.now().isoformat(),
+                            'tags': [f"domain:{domain}", "source:asm_repository"]
+                        }
+                        
+                        # Add to our knowledge store under a new 'asm_repositories' category
+                        if 'asm_repositories' not in self.knowledge_store:
+                            self.knowledge_store['asm_repositories'] = []
+                        self.knowledge_store['asm_repositories'].append(asm_entry)
+                    else:
+                        results['errors'].append(f"Error analyzing {domain}: {extracted['error']}")
+                        
+                except Exception as e:
+                    results['errors'].append(f"Error processing domain {domain}: {str(e)}")
+        
+        return results
 
     async def add_documentation(self, title: str, content: str, 
                               source_url: str = None, doc_type: str = None) -> Dict[str, Any]:

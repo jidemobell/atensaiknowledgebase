@@ -14,11 +14,7 @@ cd atensaiknowledgebase
 # 2. Setup virtual environments (auto-creates if missing)
 ./bin/setup_environments.sh
 
-# 3. Setup GitHub authentication (choose SSH for enterprise)
-./bin/setup_github_token.sh
-# Choose option 2: SSH Authentication (no token needed)
-
-# 4. Start all Knowledge Fusion services
+# 3. Start all Knowledge Fusion services
 ./bin/start_server_mode.sh
 ```
 
@@ -33,19 +29,22 @@ open-webui serve --port 8080
 # 7. Go to Admin Panel → Functions → Upload knowledge_fusion_function.py
 ```
 
-### Step 3: Initialize Knowledge Sources
+### Step 3: Setup ASM Repositories (Enterprise-Friendly)
 
 ```bash
-# 8. Initialize ASM repository structure (for your ASM analysis)
+# 8. Initialize ASM repository structure for local analysis
 ./bin/manage_asm_repos.sh --init
 
-# 9. Clone your ASM repositories into the structure:
-#    data/asm_repositories/core/
-#    data/asm_repositories/observers/
-#    data/asm_repositories/ui/
-#    etc.
+# 9. Clone your ASM repositories (use SSH for enterprise environments):
+git clone git@github.com:your-org/asm-topology-core.git data/asm_repositories/core/
+git clone git@github.com:your-org/asm-observers.git data/asm_repositories/observers/  
+git clone git@github.com:your-org/asm-ui-components.git data/asm_repositories/ui/
+# Add more ASM repos as needed...
 
-# 10. Setup automatic updates (optional)
+# 10. Extract knowledge from your ASM repositories
+./bin/asm_knowledge_extractor.py --repos-dir data/asm_repositories --output-dir data/knowledge_extracted
+
+# 11. Setup automatic repository updates (optional)
 ./bin/manage_asm_repos.sh --setup-cron
 ```
 
