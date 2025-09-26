@@ -144,6 +144,103 @@ class MultiSourceKnowledgeManager:
         
         return results
 
+    async def add_support_case_json(self, json_content: str, file_path: str = None) -> Dict[str, Any]:
+        """Add a support case from JSON format"""
+        
+        # Extract knowledge from support case JSON
+        extracted = self.extractor.extract_from_support_case_json(json_content)
+        
+        if 'error' in extracted:
+            return {'error': extracted['error']}
+        
+        # Create case entry
+        case = {
+            'id': str(uuid.uuid4()),
+            'title': f"Case {extracted['case_number']}: {extracted['subject']}",
+            'case_number': extracted['case_number'],
+            'problem_description': extracted['problem_description'],
+            'resolution_description': extracted['resolution_description'],
+            'services': extracted['services'],
+            'resolution_patterns': extracted['resolution_patterns'],
+            'hotfix_info': extracted['hotfix_info'],
+            'command_patterns': extracted['command_patterns'],
+            'error_patterns': extracted['error_patterns'],
+            'symptoms': extracted['symptoms'],
+            'severity': extracted['severity'],
+            'tags': extracted['tags'],
+            'confidence': extracted['confidence'],
+            'source_file': file_path,
+            'created_date': datetime.now().isoformat(),
+            'source_type': 'support_case_json',
+            'extraction_metadata': {
+                'auto_extracted': True,
+                'confidence_score': extracted['confidence'],
+                'extraction_timestamp': datetime.now().isoformat(),
+                'parsed_at': extracted.get('parsed_at', '')
+            }
+        }
+        
+        # Store case
+        self.knowledge_store['cases'].append(case)
+        
+        # Find similar cases
+        similar_cases = await self.find_similar_cases(case)
+        
+        return {
+            'case': case,
+            'similar_cases': similar_cases,
+            'suggestions': self._generate_case_suggestions(case, similar_cases)
+        }
+
+    async def load_support_cases_directory(self, cases_dir: str = "data/support_cases") -> Dict[str, Any]:
+        """Load and process all support case files from a directory"""
+        import os
+        from pathlib import Path
+        
+        cases_path = Path(cases_dir)
+        if not cases_path.exists():
+            return {'error': f'Support cases directory not found: {cases_dir}'}
+        
+        results = {
+            'cases_processed': 0,
+            'json_files_found': 0,
+            'text_files_found': 0,
+            'errors': [],
+            'case_numbers': []
+        }
+        
+        # Process JSON and text files
+        for file_path in cases_path.rglob("*"):
+            if file_path.is_file():
+                try:
+                    if file_path.suffix.lower() == '.json':
+                        results['json_files_found'] += 1
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            json_content = f.read()
+                        
+                        case_result = await self.add_support_case_json(json_content, str(file_path))
+                        if 'error' not in case_result:
+                            results['cases_processed'] += 1
+                            results['case_numbers'].append(case_result['case']['case_number'])
+                        else:
+                            results['errors'].append(f"Error processing {file_path.name}: {case_result['error']}")
+                    
+                    elif file_path.suffix.lower() == '.txt':
+                        results['text_files_found'] += 1
+                        with open(file_path, 'r', encoding='utf-8') as f:
+                            text_content = f.read()
+                        
+                        # Process as traditional case content
+                        case_result = await self.add_manual_case(text_content, {'source_file': str(file_path)})
+                        if case_result:
+                            results['cases_processed'] += 1
+                            results['case_numbers'].append(case_result['case'].get('title', 'Unknown'))
+                
+                except Exception as e:
+                    results['errors'].append(f"Error processing {file_path.name}: {str(e)}")
+        
+        return results
+
     async def add_documentation(self, title: str, content: str, 
                               source_url: str = None, doc_type: str = None) -> Dict[str, Any]:
         """Add documentation knowledge"""

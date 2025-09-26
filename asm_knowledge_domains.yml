@@ -130,6 +130,34 @@ asm_knowledge_domains:
       - "Disaster recovery procedures"
       - "Upgrade and migration strategies"
 
+  # Support Case Knowledge
+  support_cases:
+    description: "IBM Support case analysis and knowledge extraction"
+    focus_areas:
+      - "Hotfix deployment and validation patterns"
+      - "Version upgrade procedures and common issues"
+      - "Performance optimization recommendations"
+      - "Configuration patching and rollback procedures"
+      - "Customer environment troubleshooting"
+    case_patterns:
+      - "NOI/ASM version compatibility issues"
+      - "Kubernetes operator patching procedures"
+      - "CSV (ClusterServiceVersion) hotfix application"
+      - "Image digest updates and verification"
+      - "Pod restart and reconciliation issues"
+    resolution_patterns:
+      - "oc patch commands for hotfix deployment"
+      - "skopeo commands for image verification"
+      - "Deployment rollback procedures"
+      - "Must-gather data collection for diagnostics"
+      - "Permission and RBAC troubleshooting"
+    hotfix_categories:
+      - "UI content fixes (ibm-hdm-common-ui)"
+      - "Topology service performance improvements"
+      - "ASM MIME handling corrections"
+      - "Analytics deduplication service fixes"
+      - "Layout service memory optimizations"
+
 # Knowledge Extraction Priorities
 extraction_priorities:
   high_priority:

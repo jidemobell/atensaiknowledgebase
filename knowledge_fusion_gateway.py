@@ -2,6 +2,7 @@
 """
 Knowledge Fusion API Gateway
 Simple standalone server that integrates with OpenWebUI functions
+Enhanced with intelligent case clustering for better response quality
 """
 
 from fastapi import FastAPI, HTTPException
@@ -11,6 +12,8 @@ import asyncio
 from typing import Dict, Any, Optional
 import uvicorn
 import json
+import os
+from simple_case_clustering import SimpleCaseClusteringSystem
 
 app = FastAPI(
     title="Knowledge Fusion API Gateway",
@@ -31,6 +34,132 @@ app.add_middleware(
 KNOWLEDGE_FUSION_URL = "http://localhost:8002"
 COREBACKEND_URL = "http://localhost:8001"
 
+# Initialize intelligent case clustering for enhanced matching
+clustering_system = SimpleCaseClusteringSystem()
+cluster_cache = {}
+knowledge_base_cache = None
+
+async def load_knowledge_base():
+    """Load processed cases for similarity matching"""
+    global knowledge_base_cache
+    
+    if knowledge_base_cache is not None:
+        return knowledge_base_cache
+    
+    try:
+        knowledge_base_file = "enterprise_knowledge_base.json"
+        if os.path.exists(knowledge_base_file):
+            with open(knowledge_base_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                knowledge_base_cache = data.get('cases', [])
+                print(f"📚 Loaded {len(knowledge_base_cache)} cases for similarity matching")
+                return knowledge_base_cache
+    except Exception as e:
+        print(f"⚠️ Could not load knowledge base: {e}")
+    
+    return []
+
+async def enhance_query_with_clustering(request: Dict[str, Any], query: str) -> Dict[str, Any]:
+    """Enhance query with intelligent case matching"""
+    
+    enhanced_request = request.copy()
+    
+    try:
+        # Load knowledge base
+        cases = await load_knowledge_base()
+        
+        if not cases:
+            print("📝 No cases available for similarity matching")
+            return enhanced_request
+        
+        # Create a pseudo-case from the query
+        query_case = {
+            'title': query,
+            'description': query,
+            'full_text_for_rag': query,
+            'services': [],
+            'symptoms': [],
+            'confidence': 1.0
+        }
+        
+        # Find similar cases
+        similar_cases = clustering_system.find_similar_cases(
+            query_case, cases, top_k=5
+        )
+        
+        if similar_cases:
+            print(f"🎯 Found {len(similar_cases)} similar cases")
+            
+            # Add similar cases to request
+            enhanced_request['similar_cases'] = [
+                {
+                    'case_number': case.get('case_number', 'Unknown'),
+                    'title': case.get('title', '')[:100],
+                    'services': case.get('services', [])[:3],
+                    'resolution_patterns': case.get('resolution_patterns', [])[:2],
+                    'similarity_score': case.get('similarity_score', 0)
+                }
+                for case in similar_cases[:3]  # Top 3 most similar
+            ]
+            
+            # Extract insights
+            all_services = []
+            all_resolutions = []
+            for case in similar_cases:
+                all_services.extend(case.get('services', []))
+                all_resolutions.extend(case.get('resolution_patterns', []))
+            
+            # Add cluster insights
+            enhanced_request['cluster_insights'] = {
+                'common_services': list(set(all_services))[:5],
+                'suggested_resolutions': list(set(all_resolutions))[:3],
+                'confidence_score': sum(case.get('similarity_score', 0) for case in similar_cases) / len(similar_cases)
+            }
+            
+            print(f"💡 Enhanced query with insights from similar cases")
+        
+    except Exception as e:
+        print(f"⚠️ Error enhancing query: {e}")
+    
+    return enhanced_request
+
+def enhance_response_with_insights(core_result: Dict[str, Any], enhanced_request: Dict[str, Any]) -> Dict[str, Any]:
+    """Enhance response with clustering insights"""
+    
+    enhanced_response = core_result.copy()
+    
+    try:
+        similar_cases = enhanced_request.get('similar_cases', [])
+        cluster_insights = enhanced_request.get('cluster_insights', {})
+        
+        if similar_cases or cluster_insights:
+            # Add similarity context to response
+            context_addition = "\n\n📊 **Context from Similar Cases:**\n"
+            
+            if similar_cases:
+                context_addition += f"Found {len(similar_cases)} similar historical cases:\n"
+                for case in similar_cases[:2]:  # Top 2
+                    context_addition += f"• Case {case['case_number']}: {case['title'][:80]}...\n"
+            
+            if cluster_insights.get('suggested_resolutions'):
+                context_addition += f"\n🎯 **Common Resolution Patterns:**\n"
+                for resolution in cluster_insights['suggested_resolutions']:
+                    context_addition += f"• {resolution}\n"
+            
+            if cluster_insights.get('common_services'):
+                context_addition += f"\n🔧 **Related Services:** {', '.join(cluster_insights['common_services'])}\n"
+            
+            # Enhance the response
+            original_response = enhanced_response.get('response', '')
+            enhanced_response['response'] = original_response + context_addition
+            
+            print("✅ Enhanced response with clustering insights")
+        
+    except Exception as e:
+        print(f"⚠️ Error enhancing response: {e}")
+    
+    return enhanced_response
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
@@ -48,7 +177,7 @@ async def health_check():
 async def knowledge_fusion_query(request: Dict[str, Any]):
     """
     Main Knowledge Fusion query endpoint
-    Routes: OpenWebUI → Gateway → Knowledge Fusion Backend → CoreBackend
+    Routes: OpenWebUI → Gateway → Enhanced Matching → Knowledge Fusion Backend → CoreBackend
     """
     try:
         query = request.get("query", "")
@@ -57,13 +186,16 @@ async def knowledge_fusion_query(request: Dict[str, Any]):
         
         print(f"🔍 Processing query: {query}")
         
+        # ENHANCEMENT: Add intelligent case matching
+        enhanced_request = await enhance_query_with_clustering(request, query)
+        
         # Try to route to actual Knowledge Fusion backend first
         try:
             async with httpx.AsyncClient() as client:
                 print(f"📡 Routing to Knowledge Fusion Backend: {KNOWLEDGE_FUSION_URL}")
                 response = await client.post(
                     f"{KNOWLEDGE_FUSION_URL}/knowledge-fusion/query",
-                    json=request,
+                    json=enhanced_request,  # Send enhanced request
                     timeout=10.0
                 )
                 
@@ -82,11 +214,13 @@ async def knowledge_fusion_query(request: Dict[str, Any]):
             async with httpx.AsyncClient() as client:
                 print(f"📡 Routing to CoreBackend: {COREBACKEND_URL}")
                 
-                # Format request for CoreBackend
+                # Format request for CoreBackend with enhancements
                 corebackend_request = {
                     "query": query,
                     "session_id": request.get("conversation_id", "default"),
-                    "user_context": request.get("context", {})
+                    "user_context": request.get("context", {}),
+                    "similar_cases": enhanced_request.get("similar_cases", []),
+                    "cluster_insights": enhanced_request.get("cluster_insights", {})
                 }
                 
                 response = await client.post(
@@ -98,6 +232,10 @@ async def knowledge_fusion_query(request: Dict[str, Any]):
                 if response.status_code == 200:
                     core_result = response.json()
                     print("✅ CoreBackend responded successfully")
+                    
+                    # Enhance response with clustering insights
+                    enhanced_response = enhance_response_with_insights(core_result, enhanced_request)
+                    return enhanced_response
                     
                     # Format CoreBackend response for OpenWebUI
                     return {
