@@ -691,6 +691,36 @@ async def legacy_query(request: dict):
         "knowledge_areas_detected": ["temporal_analysis", "predictive_synthesis"]
     }
 
+# Gateway compatibility endpoint
+@app.post("/knowledge-fusion/query")
+async def knowledge_fusion_query(request: dict):
+    """Gateway-compatible endpoint for Knowledge Fusion queries"""
+    
+    # Extract query from the request format sent by the gateway
+    query = request.get('query', '')
+    user_id = request.get('user_id', 'anonymous')
+    conversation_id = request.get('conversation_id', str(uuid.uuid4()))
+    
+    novel_query = NovelQuery(
+        query=query,
+        user_id=user_id,
+        conversation_id=conversation_id,
+        synthesis_mode="adaptive"
+    )
+    
+    response = await novel_synthesis_engine.novel_synthesis(novel_query)
+    
+    # Return in format expected by gateway
+    return {
+        "response": response.primary_response,
+        "sources_used": list(response.confidence_breakdown.keys()),
+        "confidence": response.confidence_breakdown.get('overall', 0.5),
+        "reasoning": f"Novel synthesis with {len(response.predictive_insights)} predictive insights",
+        "suggested_follow_ups": response.proactive_suggestions[:2],
+        "conversation_id": conversation_id,
+        "knowledge_areas_detected": ["temporal_analysis", "predictive_synthesis"]
+    }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8003)
