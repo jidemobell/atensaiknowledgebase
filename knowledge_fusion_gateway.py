@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Knowledge Fusion API Gateway
-Simple standalone server that integrates with OpenWebUI functions
-Enhanced with intelligent case clustering for better response quality
+Knowledge Fusion API Gateway - Phase 2 Enhanced
+Multi-Agent System Integration with intelligent routing and cross-source validation
+Enhanced with intelligent case clustering and specialized knowledge agents
 """
 
 from fastapi import FastAPI, HTTPException
@@ -14,6 +14,15 @@ import uvicorn
 import json
 import os
 from simple_case_clustering import SimpleCaseClusteringSystem
+
+# Phase 2: Multi-Agent System Integration  
+try:
+    from multi_agent_orchestrator import create_multi_agent_system
+    MULTI_AGENT_ENABLED = True
+    print("🤖 Multi-Agent System: ENABLED")
+except ImportError as e:
+    MULTI_AGENT_ENABLED = False
+    print(f"⚠️ Multi-Agent System: DISABLED ({e})")
 
 app = FastAPI(
     title="Knowledge Fusion API Gateway",
@@ -38,6 +47,16 @@ COREBACKEND_URL = "http://localhost:8001"
 clustering_system = SimpleCaseClusteringSystem()
 cluster_cache = {}
 knowledge_base_cache = None
+
+# Phase 2: Initialize Multi-Agent System
+multi_agent_orchestrator = None
+if MULTI_AGENT_ENABLED:
+    try:
+        multi_agent_orchestrator = create_multi_agent_system()
+        print("🎯 Multi-Agent Orchestrator initialized successfully")
+    except Exception as e:
+        print(f"⚠️ Failed to initialize Multi-Agent System: {e}")
+        multi_agent_orchestrator = None
 
 async def load_knowledge_base():
     """Load processed cases for similarity matching"""
@@ -166,17 +185,160 @@ async def health_check():
     return {
         "status": "healthy",
         "service": "Knowledge Fusion API Gateway",
-        "version": "1.0.0",
+        "version": "2.0.0 (Multi-Agent Enhanced)",
         "backends": {
             "knowledge_fusion": KNOWLEDGE_FUSION_URL,
             "corebackend": COREBACKEND_URL
+        },
+        "capabilities": {
+            "multi_agent_system": MULTI_AGENT_ENABLED,
+            "case_clustering": True,
+            "cross_validation": MULTI_AGENT_ENABLED,
+            "dynamic_source_selection": MULTI_AGENT_ENABLED
         }
     }
+
+@app.post("/knowledge-fusion/intelligent")
+async def intelligent_knowledge_query(request: Dict[str, Any]):
+    """
+    Phase 2: Intelligent routing endpoint
+    Automatically selects multi-agent or standard processing based on query complexity
+    """
+    query = request.get("query", "")
+    
+    # Analyze query complexity and requirements
+    should_use_multi_agent = await _should_use_multi_agent_processing(query, request)
+    
+    if should_use_multi_agent and multi_agent_orchestrator:
+        print(f"🧠 Routing to Multi-Agent System (complexity: high)")
+        return await multi_agent_knowledge_query(request)
+    else:
+        print(f"🔄 Routing to Standard Processing (complexity: standard)")
+        return await knowledge_fusion_query(request)
+
+async def _should_use_multi_agent_processing(query: str, request: Dict[str, Any]) -> bool:
+    """Determine if query requires multi-agent processing"""
+    
+    if not MULTI_AGENT_ENABLED:
+        return False
+    
+    # Complexity indicators that benefit from multi-agent processing
+    complexity_indicators = [
+        # Multiple domain query
+        len([domain for domain in ['topology', 'case', 'github', 'service', 'config'] 
+             if domain in query.lower()]) > 1,
+        
+        # Comparative questions
+        any(word in query.lower() for word in ['compare', 'versus', 'vs', 'difference', 'better']),
+        
+        # Complex troubleshooting
+        any(word in query.lower() for word in ['troubleshoot', 'diagnose', 'root cause', 'analyze']),
+        
+        # Multi-step requests
+        any(word in query.lower() for word in ['step by step', 'how to setup', 'configure and']),
+        
+        # Cross-validation needs
+        any(word in query.lower() for word in ['validate', 'verify', 'confirm', 'check multiple']),
+        
+        # Query length (longer queries often need multiple perspectives)
+        len(query.split()) > 15,
+        
+        # Historical context requested
+        'similar_cases' in request or 'historical' in query.lower()
+    ]
+    
+    # Use multi-agent if 2 or more complexity indicators are present
+    complexity_score = sum(complexity_indicators)
+    return complexity_score >= 2
+
+@app.post("/knowledge-fusion/multi-agent")
+async def multi_agent_knowledge_query(request: Dict[str, Any]):
+    """
+    Phase 2: Multi-Agent Knowledge Fusion endpoint
+    Routes: OpenWebUI → Gateway → Multi-Agent Orchestrator → Specialized Agents → Cross-Validation
+    """
+    if not multi_agent_orchestrator:
+        # Fallback to standard processing
+        return await knowledge_fusion_query(request)
+    
+    try:
+        query = request.get("query", "")
+        if not query:
+            raise HTTPException(status_code=400, detail="Query is required")
+        
+        print(f"🤖 Multi-Agent Processing: {query}")
+        
+        # Build enhanced context from existing clustering
+        enhanced_request = await enhance_query_with_clustering(request, query)
+        context = {
+            **enhanced_request,
+            "conversation_id": request.get("conversation_id", "default"),
+            "user_preferences": request.get("preferences", {}),
+            "priority": request.get("priority", "normal")
+        }
+        
+        # Process query through multi-agent system
+        session_id = request.get("conversation_id", "default")
+        result = await multi_agent_orchestrator.process_query(query, context, session_id)
+        
+        # Format response for OpenWebUI
+        multi_agent_response = {
+            "response": f"""🧠 **Multi-Agent Knowledge Analysis**
+
+{result['response']}
+
+---
+**Intelligence Summary:**
+• **Confidence**: {result['confidence']:.1%}
+• **Agents Consulted**: {result['agents_consulted']} specialized knowledge agents
+• **Processing Time**: {result['processing_time']:.2f}s
+• **Sources Cross-Validated**: {len(result['sources'])}
+
+**Agent Breakdown:**""",
+            
+            "sources_used": [source["agent_id"] for source in result["sources"]],
+            "confidence": result["confidence"],
+            "reasoning": f"Multi-agent analysis with {result['agents_consulted']} specialized agents",
+            "knowledge_areas_detected": list(set([
+                tag for source in result["sources"] 
+                for tag in source.get("metadata", {}).get("tags", [])
+            ])),
+            "processing_details": {
+                "multi_agent_enabled": True,
+                "agents_consulted": result["agents_consulted"],
+                "cross_validation": result.get("validation_results", {}),
+                "recommendations": result.get("recommendations", [])
+            },
+            "suggested_follow_ups": [
+                "Would you like more details from specific knowledge agents?",
+                "Do you need analysis from additional knowledge sources?",
+                "Should I cross-validate this information with other agents?"
+            ]
+        }
+        
+        # Add agent details
+        for i, source in enumerate(result["sources"], 1):
+            agent_name = source["agent_id"].replace("_", " ").title()
+            confidence = source["confidence"]
+            multi_agent_response["response"] += f"\n{i}. **{agent_name}**: {confidence:.1%} confidence"
+        
+        if result.get("recommendations"):
+            multi_agent_response["response"] += "\n\n**Recommendations:**"
+            for rec in result["recommendations"][:3]:
+                multi_agent_response["response"] += f"\n• {rec}"
+        
+        print(f"✅ Multi-Agent response generated with {result['confidence']:.1%} confidence")
+        return multi_agent_response
+        
+    except Exception as e:
+        print(f"❌ Multi-Agent processing error: {e}")
+        # Fallback to standard processing
+        return await knowledge_fusion_query(request)
 
 @app.post("/knowledge-fusion/query")
 async def knowledge_fusion_query(request: Dict[str, Any]):
     """
-    Main Knowledge Fusion query endpoint
+    Standard Knowledge Fusion query endpoint (Phase 1)
     Routes: OpenWebUI → Gateway → Enhanced Matching → Knowledge Fusion Backend → CoreBackend
     """
     try:
