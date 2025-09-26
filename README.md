@@ -53,7 +53,7 @@ git clone git@github.com:your-org/asm-documentation.git data/asm_repositories/do
 # Add more ASM repos as needed...
 
 # 10. Extract knowledge from your ASM repositories
-./bin/asm_knowledge_extractor.py --repos-dir data/asm_repositories --output-dir data/knowledge_extracted
+python ./bin/asm_knowledge_extractor.py --repos-dir data/asm_repositories --output-dir data/knowledge_extracted
 
 # 11. Setup automatic repository updates (optional)
 ./bin/manage_asm_repos.sh --setup-cron
