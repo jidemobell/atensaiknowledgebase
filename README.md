@@ -1,14 +1,25 @@
 # IBM Knowledge Fusion Platform
 
-**Beyond Basic RAG** - A next-generation knowledge integration platform that provides intelligent routing, multi-source synthesis, advanced AI capabilities, and **enterprise-scale support case processing** through seamless integration with OpenWebUI.
+**Beyond Basic RAG** - A next-generation knowledge integration platform with **Phase 2 Multi-Agent Intelligence** that provides specialized knowledge agents, cross-source validation, dynamic source management, and **enterprise-scale support case processing** through seamless integration with OpenWebUI.
 
-## 🚀 **NEW: Enterprise Support Case Processing**
+## 🤖 **NEW: Phase 2 Multi-Agent Intelligence System**
+
+Advanced AI agent architecture with specialized domain experts:
+- **🔧 Topology Agent** - ASM topology expert (nasm-topology, merge-service, observers)
+- **📋 Case Analysis Agent** - Support case specialist (urgency assessment, resolution patterns)
+- **📁 GitHub Source Agent** - Repository knowledge expert (documentation, code analysis)
+- **🧠 Dynamic Source Management** - Performance-based intelligent agent selection
+- **🔍 Cross-Source Validation** - Consistency analysis and conflict detection
+- **⏱️ Temporal Reasoning** - Session context and learning evolution
+
+## 🚀 **Enterprise Support Case Processing**
 
 Transform thousands of diverse IBM support cases into actionable knowledge with:
 - **Intelligent Case Clustering** - Groups similar issues automatically
 - **Adaptive Pattern Recognition** - Handles varying case contexts and formats
 - **Historical Case Context** - Enhances responses with proven solutions
 - **Enterprise-Scale Processing** - Parallel processing for massive case collections
+- **Multi-Agent Enhancement** - Specialized agents provide domain-specific insights
 - **Seamless Integration** - No workflow changes required for existing users
 
 ## 📋 Complete Setup Guide
@@ -98,17 +109,42 @@ mkdir -p data/case_studies/case_002/{documents,images,logs}
 
 ## �️ System Architecture & Component Roles
 
-### **OpenWebUI → Knowledge Fusion Function → Gateway → CoreBackend**
+### **OpenWebUI → Knowledge Fusion Function → Multi-Agent Gateway → Specialized Agents → CoreBackend**
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌────────────────┐    ┌─────────────────┐
-│   OpenWebUI     │───▶│ Knowledge Fusion │───▶│ API Gateway    │───▶│  CoreBackend    │
-│                 │    │   Function       │    │                │    │                │
-│ • User interface│    │ • Query routing  │    │ • Intelligence │    │ • Diagnostics   │
-│ • Chat UI       │    │ • Request format │    │ • Case matching│    │ • Pattern match │
-│ • File upload   │    │ • Error handling │    │ • Enhancement  │    │ • Vector search │
-│ • Response      │    │ • Status updates │    │ • Load balance │    │ • Knowledge KB  │
+│   OpenWebUI     │───▶│ Knowledge Fusion │───▶│ Multi-Agent    │───▶│ Specialized     │
+│                 │    │   Function       │    │ Gateway        │    │ Agents          │
+│ • User interface│    │ • Query routing  │    │                │    │                 │
+│ • Chat UI       │    │ • Request format │    │ • Intelligence │    │ 🔧 TopologyAgent│
+│ • File upload   │    │ • Error handling │    │ • Agent routing│    │ 📋 CaseAgent    │
+│ • Response      │    │ • Status updates │    │ • Enhancement  │    │ 📁 GitHubAgent  │
 └─────────────────┘    └──────────────────┘    └────────────────┘    └─────────────────┘
+                                                         │                        │
+                                                         ▼                        ▼
+┌─────────────────────────────────────────────────────────────────────────────────────┐
+│                           🧠 Multi-Agent Orchestrator                              │
+│                                                                                     │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐  ┌─────────────┐ │
+│  │ Dynamic Source   │  │ Cross-Source     │  │ Agent            │  │ Response    │ │
+│  │ Management       │  │ Validation       │  │ Communication    │  │ Synthesis   │ │
+│  │                  │  │                  │  │ Hub              │  │             │ │
+│  │ • Performance    │  │ • Consistency    │  │ • Parallel       │  │ • Combine   │ │
+│  │   Tracking       │  │   Analysis       │  │   Processing     │  │   Sources   │ │
+│  │ • Reliability    │  │ • Conflict       │  │ • Timeout        │  │ • Validate  │ │
+│  │   Scoring        │  │   Detection      │  │   Handling       │  │   Results   │ │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘  └─────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────────────┘
+                                                         │
+                                                         ▼
+                                      ┌────────────────────────────────┐
+                                      │        CoreBackend             │
+                                      │                                │
+                                      │ • Diagnostics & Pattern Match  │
+                                      │ • Vector Search & Knowledge KB │
+                                      │ • Session Management           │
+                                      │ • Fallback Processing          │
+                                      └────────────────────────────────┘
 ```
 
 ### **Component Responsibilities:**
@@ -122,15 +158,19 @@ mkdir -p data/case_studies/case_002/{documents,images,logs}
   - Provides real-time status updates to users
   - Formats responses for OpenWebUI display
 
-#### **🚪 API Gateway (`knowledge_fusion_gateway.py`)**
-- **Role:** Intelligent routing and enhancement layer
+#### **🤖 Multi-Agent Gateway (`knowledge_fusion_gateway.py`)**
+- **Role:** Phase 2 Intelligence - Multi-agent orchestration and enhancement layer
 - **What it does:**
+  - **🧠 Multi-Agent Orchestration:** Routes complex queries to specialized agents
+  - **🎯 Intelligent Complexity Analysis:** Automatically detects query complexity
+  - **⚡ Parallel Agent Processing:** Executes multiple agents simultaneously
+  - **🔍 Cross-Source Validation:** Validates consistency across agent responses
+  - **📊 Dynamic Source Selection:** Chooses optimal agents based on performance
   - **NEW:** Loads processed support cases for similarity matching
   - **NEW:** Finds similar historical cases for each query
   - **NEW:** Enhances requests with proven resolution patterns
-  - Routes enhanced requests to CoreBackend
   - **NEW:** Adds clustering insights to responses
-  - Provides fallback handling between services
+  - Provides graceful fallback to Phase 1 processing
 
 #### **🧠 CoreBackend (`corebackend/implementation/backend/`)**
 - **Role:** Advanced diagnostic and analysis engine
@@ -160,12 +200,61 @@ mkdir -p data/case_studies/case_002/{documents,images,logs}
   - **Similarity Matching:** Finds historical cases related to new queries
   - **Insight Generation:** Provides actionable recommendations
 
-### **🔄 Enhanced Query Flow with New Intelligence:**
+#### **🤖 Multi-Agent Knowledge System (Phase 2)**
+
+##### **🧠 Multi-Agent Foundation (`multi_agent_foundation.py`)**
+- **Role:** Core infrastructure for specialized knowledge agents
+- **What it does:**
+  - **BaseKnowledgeAgent:** Abstract foundation for all specialized agents
+  - **AgentCommunicationHub:** Central coordination and message routing
+  - **KnowledgeValidator:** Cross-source validation with consistency scoring
+  - **Performance Metrics:** Real-time tracking of agent reliability and response quality
+
+##### **🎯 Specialized Knowledge Agents (`specialized_knowledge_agents.py`)**
+- **🔧 TopologyAgent:** ASM topology expert specializing in:
+  - nasm-topology, merge-service, ui-content, observer services
+  - Service analysis, troubleshooting guidance, configuration examples
+  - Common issue patterns and resolution workflows
+- **📋 CaseAnalysisAgent:** Support case specialist providing:
+  - Urgency assessment and issue categorization
+  - Historical case matching and pattern recognition
+  - Resolution recommendations based on case similarity
+- **📁 GitHubSourceAgent:** Repository knowledge expert offering:
+  - Documentation analysis and code insights
+  - Repository structure evaluation and best practices
+  - Issue tracking and development pattern analysis
+
+##### **🎮 Multi-Agent Orchestrator (`multi_agent_orchestrator.py`)**
+- **Role:** Central intelligence coordination system
+- **What it does:**
+  - **DynamicSourceManager:** Performance-based agent selection with learning
+  - **QueryContext:** Enhanced context with temporal and relational information
+  - **Parallel Processing:** Concurrent agent execution with response synthesis
+  - **Cross-Validation:** Multi-source consistency analysis and conflict resolution
+
+### **🔄 Phase 2 Multi-Agent Enhanced Query Flow:**
 
 ```
-User Query → Function → Gateway (+ Smart Matching) → CoreBackend (+ Case Context) → Enhanced Response
-     ↑                              ↓                           ↓                           ↓
-📱 OpenWebUI              🧠 Historical Cases        🔍 Diagnostic Engine       ✨ Context-Rich Answer
+User Query → Function → Multi-Agent Gateway → Specialized Agents → Cross-Validation → Enhanced Response
+     ↑                           ↓                      ↓                    ↓                ↓
+📱 OpenWebUI         🧠 Complexity Analysis    � Parallel Processing   🔍 Consistency Check  ✨ Synthesized Answer
+
+                                ↓
+                     ┌─────────────────────┐
+                     │ 🔧 Topology Agent   │ ── Service Analysis
+                     ├─────────────────────┤
+                     │ 📋 Case Agent       │ ── Historical Context  
+                     ├─────────────────────┤
+                     │ � GitHub Agent     │ ── Code & Docs
+                     └─────────────────────┘
+                                ↓
+                     ┌─────────────────────┐
+                     │ 🎯 Response Fusion  │
+                     │ • Cross-validate    │
+                     │ • Detect conflicts  │ → CoreBackend (Fallback)
+                     │ • Synthesize        │
+                     │ • Add confidence    │
+                     └─────────────────────┘
 ```
 
 ## �🎯 What Happens Behind the Scenes
@@ -189,18 +278,27 @@ User Query → Function → Gateway (+ Smart Matching) → CoreBackend (+ Case C
    - Provides ASM-specific context
    - Includes code examples and step-by-step solutions
 
-## 🏗️ Service Architecture
+## 🏗️ Service Architecture - Phase 2 Multi-Agent Enhanced
 
 ```
 Port 8080: OpenWebUI (Your Interface)
     ↓
-Port 9000: Knowledge Fusion Gateway (Request Router)
+Port 9000: Multi-Agent Knowledge Fusion Gateway (Phase 2 Intelligence)
+    ├─ /knowledge-fusion/intelligent (Auto-routing)
+    ├─ /knowledge-fusion/multi-agent (Full multi-agent)
+    └─ /knowledge-fusion/query (Phase 1 fallback)
+    ↓
+🤖 Multi-Agent System:
+    ├─ TopologyAgent (ASM Services Expert)
+    ├─ CaseAnalysisAgent (Support Case Specialist)  
+    ├─ GitHubSourceAgent (Repository Expert)
+    └─ Cross-Source Validation & Synthesis
     ↓
 Port 8002: Knowledge Fusion Backend (AI Processing)
     ↓
 Port 8001: Core Backend (Knowledge Search & Analysis)
     ↓
-Local Data: ASM Repos + Case Studies + Documentation
+Local Data: ASM Repos + Case Studies + Documentation + Agent Performance Metrics
 ```
 
 ## 🗂️ Knowledge Sources Structure
@@ -296,6 +394,48 @@ Found 3 similar historical cases:
 - **Text Files** - Plain text case descriptions
 - **CSV Files** - Structured case data in spreadsheet format
 - **Mixed Formats** - Automatic format detection and processing
+
+## 🤖 Phase 2 Multi-Agent System Usage
+
+### **Automatic Intelligence (Recommended)**
+The system automatically detects query complexity and routes to appropriate processing:
+
+```bash
+# Your queries automatically get enhanced intelligence:
+# Simple queries → Standard processing
+# Complex queries → Multi-agent processing
+
+# Examples that trigger multi-agent processing:
+- "Compare topology configuration between multiple sources"
+- "Troubleshoot connectivity issues and find similar historical cases"  
+- "Analyze GitHub documentation and validate with case studies"
+- "Cross-validate ASM setup procedures from multiple sources"
+```
+
+### **Manual Multi-Agent Control (Advanced)**
+For explicit control over multi-agent processing:
+
+#### **Available Endpoints:**
+- **`/knowledge-fusion/intelligent`** - Automatic complexity-based routing (recommended)
+- **`/knowledge-fusion/multi-agent`** - Force multi-agent processing
+- **`/knowledge-fusion/query`** - Standard Phase 1 processing
+
+#### **Multi-Agent Benefits:**
+- **🎯 Specialized Expertise:** Domain-specific agents with deep knowledge
+- **🔍 Cross-Validation:** Consistency checking across multiple sources
+- **⚡ Parallel Processing:** Multiple agents working simultaneously  
+- **📊 Performance Learning:** System improves through usage patterns
+- **🧠 Intelligent Synthesis:** Coherent responses from multiple perspectives
+
+### **Query Complexity Indicators:**
+The system uses multi-agent processing when it detects:
+- Multiple knowledge domains in one query
+- Comparative or validation requests
+- Complex troubleshooting scenarios
+- Multi-step configuration requests
+- Cross-source verification needs
+- Long, detailed queries (15+ words)
+- Historical context requirements
 
 ## ✅ Startup Checklist
 
