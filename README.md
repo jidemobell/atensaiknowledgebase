@@ -37,9 +37,10 @@ open-webui serve --port 8080
 
 # 9. Clone your ASM repositories (use SSH for enterprise environments):
 git clone git@github.com:your-org/asm-core-services.git data/asm_repositories/core_services/
-git clone git@github.com:your-org/asm-topology-service.git data/asm_repositories/topology/
+# Core services includes topology, merge, status, inventory services
 git clone git@github.com:your-org/asm-observers.git data/asm_repositories/observers/  
 git clone git@github.com:your-org/asm-ui-components.git data/asm_repositories/ui/
+git clone git@github.com:your-org/asm-documentation.git data/asm_repositories/documentation/
 # Add more ASM repos as needed...
 
 # 10. Extract knowledge from your ASM repositories

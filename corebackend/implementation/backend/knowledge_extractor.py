@@ -588,7 +588,7 @@ class KnowledgeExtractor:
         if domain:
             if domain == 'core_services':
                 patterns['domain_specific'].extend(self._detect_core_services_patterns(data))
-            elif domain == 'topology':
+                # Core services includes topology patterns
                 patterns['domain_specific'].extend(self._detect_topology_patterns(data))
             elif domain == 'observers':
                 patterns['domain_specific'].extend(self._detect_observer_patterns(data))
