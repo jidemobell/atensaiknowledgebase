@@ -2,60 +2,282 @@
 
 **Beyond Basic RAG** - A next-generation knowledge integration platform that provides intelligent routing, multi-source synthesis, and advanced AI capabilities through seamless integration with OpenWebUI.
 
-> 🎯 **Recently Organized**: Platform now features clean architecture with all scripts in `bin/`, comprehensive documentation in `docs/`, and streamlined setup process.
+## 📋 Complete Setup Guide
 
-## Quick Start (5 minutes)
+### Step 1: Installation & Environment Setup
 
 ```bash
-# 1. Setup virtual environments (auto-creates if missing)
+# 1. Clone the repository
+git clone git@github.com:jidemobell/atensaiknowledgebase.git
+cd atensaiknowledgebase
+
+# 2. Setup virtual environments (auto-creates if missing)
 ./bin/setup_environments.sh
 
-# 2. Setup GitHub authentication (SSH or token)
+# 3. Setup GitHub authentication (choose SSH for enterprise)
 ./bin/setup_github_token.sh
+# Choose option 2: SSH Authentication (no token needed)
 
-# 3. Start Knowledge Fusion services
+# 4. Start all Knowledge Fusion services
 ./bin/start_server_mode.sh
+```
 
-# 4. Install OpenWebUI separately  
+### Step 2: OpenWebUI Integration
+
+```bash
+# 5. Install OpenWebUI (in separate terminal/environment)
 pip install open-webui
 open-webui serve --port 8080
 
-# 5. Upload knowledge_fusion_function.py to OpenWebUI Admin Panel → Functions
-# 6. Start chatting with enhanced AI capabilities!
+# 6. Open browser: http://localhost:8080
+# 7. Go to Admin Panel → Functions → Upload knowledge_fusion_function.py
 ```
 
-> 📚 **Need detailed instructions?** See [`docs/COMPLETE_DOCUMENTATION.md`](docs/COMPLETE_DOCUMENTATION.md) for comprehensive script reference, troubleshooting, and advanced usage.
+### Step 3: Initialize Knowledge Sources
 
-## Architecture Overview
+```bash
+# 8. Initialize ASM repository structure (for your ASM analysis)
+./bin/manage_asm_repos.sh --init
+
+# 9. Clone your ASM repositories into the structure:
+#    data/asm_repositories/core/
+#    data/asm_repositories/observers/
+#    data/asm_repositories/ui/
+#    etc.
+
+# 10. Setup automatic updates (optional)
+./bin/manage_asm_repos.sh --setup-cron
+```
+
+### Step 4: Add Your Content
+
+```bash
+# Create case study structure
+mkdir -p data/case_studies/case_001/{documents,images,logs}
+mkdir -p data/case_studies/case_002/{documents,images,logs}
+
+# Add your existing case files:
+# - Text documents in documents/
+# - Screenshots in images/  
+# - Log files in logs/
+# - Any other relevant files
+```
+
+## 🔄 Query Flow: From Question to Answer
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌────────────────┐    ┌─────────────────┐
-│   OpenWebUI     │───▶│ Knowledge Fusion │───▶│ Core Backend   │───▶│     Ollama      │
-│  (External)     │    │   Gateway        │    │    Engine      │    │   Models        │
-│   Port 8080     │    │   Port 9000      │    │   Port 8001    │    │  Port 11434     │
+│   User Query    │───▶│ Knowledge Fusion │───▶│ Core Backend   │───▶│  Knowledge      │
+│   (OpenWebUI)   │    │   Function       │    │   Analysis     │    │  Sources        │
+│                 │    │                  │    │                │    │                 │
+│ "How to fix     │    │ • Route query    │    │ • ASM patterns │    │ • ASM repos     │
+│  topology       │    │ • Context prep   │    │ • Case studies │    │ • Case files    │
+│  sync issues?"  │    │ • Multi-source   │    │ • Best practices│    │ • Documentation │
 └─────────────────┘    └──────────────────┘    └────────────────┘    └─────────────────┘
-                                │
-                                │
-                         ┌──────▼──────┐
-                         │ Knowledge   │
-                         │  Fusion     │
-                         │ Backend     │
-                         │ Port 8002   │
-                         └─────────────┘
+         ▲                        │                        │                        │
+         │                        ▼                        ▼                        ▼
+┌─────────────────┐    ┌──────────────────┐    ┌────────────────┐    ┌─────────────────┐
+│   Enhanced      │◀───│  Response        │◀───│   Knowledge    │◀───│   Search &      │
+│   Answer        │    │  Synthesis       │    │   Matching     │    │   Analysis      │
+│                 │    │                  │    │                │    │                 │
+│ • Step-by-step  │    │ • Combine info   │    │ • Similar cases│    │ • Pattern match │
+│ • Code examples │    │ • Add context    │    │ • Code patterns│    │ • Relevance     │
+│ • ASM-specific  │    │ • Best practices │    │ • Solutions    │    │ • Ranking       │
+└─────────────────┘    └──────────────────┘    └────────────────┘    └─────────────────┘
 ```
 
-This **pipe-based integration** approach allows OpenWebUI to leverage advanced Knowledge Fusion capabilities while maintaining its familiar interface.
+## 🎯 What Happens Behind the Scenes
 
-## Why Knowledge Fusion?
+### When You Ask a Question:
 
-### Traditional RAG Limitations:
-- **Single-source limitation**: Can only query one database at a time
-- **Context fragmentation**: Loses connections between related information  
-- **Static responses**: No dynamic knowledge synthesis
-- **Limited reasoning**: Simple similarity matching only
+1. **OpenWebUI** receives your query
+2. **Knowledge Fusion Function** processes the request:
+   - Identifies query type (ASM topology, observer config, etc.)
+   - Determines which knowledge sources to search
+3. **Core Backend** performs analysis:
+   - Searches ASM repository patterns
+   - Matches against case studies
+   - Finds relevant documentation
+4. **Knowledge Sources** provide data:
+   - Local ASM repositories (code patterns, configs)
+   - Case study files (similar problems, solutions)
+   - Documentation (best practices, guides)
+5. **Response Synthesis** creates answer:
+   - Combines multiple knowledge sources
+   - Provides ASM-specific context
+   - Includes code examples and step-by-step solutions
 
-### Knowledge Fusion Solution:
-- **Multi-source intelligence**: Queries multiple knowledge bases simultaneously
+## 🏗️ Service Architecture
+
+```
+Port 8080: OpenWebUI (Your Interface)
+    ↓
+Port 9000: Knowledge Fusion Gateway (Request Router)
+    ↓
+Port 8002: Knowledge Fusion Backend (AI Processing)
+    ↓
+Port 8001: Core Backend (Knowledge Search & Analysis)
+    ↓
+Local Data: ASM Repos + Case Studies + Documentation
+```
+
+## 🗂️ Knowledge Sources Structure
+
+```
+data/
+├── asm_repositories/          # Your cloned ASM repos
+│   ├── core/                 # ASM core services
+│   ├── observers/            # Observer implementations  
+│   ├── ui/                   # UI components
+│   └── services/             # Backend services
+├── case_studies/             # Your case files
+│   ├── case_001/
+│   │   ├── documents/        # Text files, PDFs
+│   │   ├── images/          # Screenshots, diagrams
+│   │   └── logs/            # Log files, traces
+│   └── case_002/
+└── documentation/            # Additional docs
+```
+
+## ✅ Startup Checklist
+
+### Services Running?
+```bash
+curl http://localhost:8001/health  # ✅ Core Backend
+curl http://localhost:8002/health  # ✅ Knowledge Fusion  
+curl http://localhost:9000/health  # ✅ Gateway
+curl http://localhost:8080/health  # ✅ OpenWebUI
+```
+
+### Knowledge Sources Ready?
+- [ ] ASM repositories cloned in `data/asm_repositories/`
+- [ ] Case studies organized in `data/case_studies/`
+- [ ] Documentation added to `data/documentation/`
+- [ ] Knowledge Fusion function uploaded to OpenWebUI
+
+### Test Your Setup
+In OpenWebUI, try these questions:
+- "What ASM services handle topology data?"
+- "How does Kafka message flow work in ASM?"
+- "Show me observer configuration patterns"
+
+**Expected Response**: Detailed answers with ASM-specific context, code examples, and references to your actual repositories.
+
+## 🚨 Common Issues & Solutions
+
+**"Services won't start"**
+```bash
+./bin/cleanup_platform.sh --soft  # Stop everything
+./bin/start_server_mode.sh         # Fresh start
+```
+
+**"OpenWebUI can't connect"**  
+- Check function is uploaded in Admin → Functions
+- Verify Gateway is running on port 9000
+- Check logs: `./bin/view_logs.sh --service gateway`
+
+**"No ASM knowledge in responses"**
+- Ensure ASM repos are cloned in correct structure
+- Run initial analysis: `./bin/manage_asm_repos.sh --analyze`
+- Check Core Backend has access to data directory
+
+> 📚 **Detailed troubleshooting**: [`docs/COMPLETE_DOCUMENTATION.md`](docs/COMPLETE_DOCUMENTATION.md)
+
+## 🧠 Theory: How Knowledge Fusion Works
+
+### Traditional RAG vs Knowledge Fusion
+
+**❌ Traditional RAG Problems:**
+- Single knowledge source (one database)  
+- Simple similarity matching only
+- No context between different types of information
+- Generic responses without domain expertise
+
+**✅ Knowledge Fusion Solution:**
+- **Multi-Source Intelligence**: ASM repos + case studies + documentation
+- **Domain-Aware Processing**: Understands ASM architecture patterns
+- **Context Synthesis**: Combines code patterns with case solutions
+- **Intelligent Routing**: Routes queries to appropriate knowledge sources
+
+### Why This Matters for ASM
+
+Your ASM questions need answers that combine:
+- **Code Patterns** (from repositories): How things are implemented
+- **Case Studies** (from your experience): What problems occurred and solutions
+- **Architecture Knowledge** (from docs): How components interact
+
+Traditional AI can't connect these - Knowledge Fusion can.
+
+## 🏗️ Architecture: The Complete Picture
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌────────────────┐
+│   OpenWebUI     │───▶│ Knowledge Fusion │───▶│ Core Backend   │
+│  (Your Chat)    │    │   Gateway        │    │ (ASM Analysis) │
+│   Port 8080     │    │   Port 9000      │    │   Port 8001    │
+└─────────────────┘    └──────────────────┘    └────────────────┘
+                                │                        │
+                                │                        ▼
+                                ▼                ┌─────────────────┐
+                         ┌──────────────┐       │ Knowledge Base  │
+                         │ Knowledge    │       │                 │
+                         │  Fusion      │       │ • ASM Repos     │
+                         │ Backend      │       │ • Case Studies  │
+                         │ Port 8002    │       │ • Documentation │
+                         └──────────────┘       └─────────────────┘
+```
+
+**Each Service's Role:**
+- **OpenWebUI**: Your familiar chat interface
+- **Gateway (9000)**: Routes requests and manages responses  
+- **Knowledge Fusion (8002)**: AI processing with domain awareness
+- **Core Backend (8001)**: Searches and analyzes your ASM knowledge
+- **Knowledge Base**: Your local ASM repos, cases, and docs
+
+## 📊 Visual Flow Diagram
+
+```
+🧑 User: "Why is ASM topology sync failing?"
+│
+├─ 🔍 Query Analysis
+│  ├─ Identifies: ASM topology issue
+│  ├─ Domain: Infrastructure/Services  
+│  └─ Type: Troubleshooting
+│
+├─ 🎯 Knowledge Source Selection
+│  ├─ ASM Core Repositories (topology service patterns)
+│  ├─ Case Studies (similar sync failures)
+│  └─ Documentation (sync troubleshooting guides)
+│
+├─ 🔎 Parallel Search & Analysis
+│  ├─ Code Pattern Search: "topology sync" in repos
+│  ├─ Case Study Match: Previous sync issues
+│  └─ Best Practice Lookup: Sync troubleshooting
+│
+├─ 🧠 Intelligence Synthesis
+│  ├─ Combines code patterns with case solutions
+│  ├─ Adds ASM-specific context
+│  └─ Provides step-by-step resolution
+│
+└─ 📝 Enhanced Response
+   ├─ Root cause analysis (Kafka topic issues?)
+   ├─ Specific ASM service logs to check
+   ├─ Code examples from your repos
+   ├─ Similar cases and their solutions  
+   └─ Step-by-step resolution guide
+```
+
+## 💡 Key Insight: The Python Extractor Role
+
+**You asked why run the Python extractor?** Here's the clarity:
+
+- **Knowledge Fusion Function** = Real-time query processing (always running)
+- **Python ASM Extractor** = One-time setup to analyze your repos and build knowledge index
+
+Think of it like:
+- **Building a library** (Python extractor) vs **Using the library** (Knowledge Fusion)
+- You only run the extractor when you add new repos or want to update the knowledge base
+- The Knowledge Fusion system uses the pre-analyzed knowledge for fast responses
 - **Dynamic synthesis**: Combines information from different sources contextually
 - **Intelligent routing**: Automatically selects best knowledge sources
 - **Advanced reasoning**: Uses embedding similarity + semantic understanding
