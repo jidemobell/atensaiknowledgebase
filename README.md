@@ -1,6 +1,15 @@
 # IBM Knowledge Fusion Platform
 
-**Beyond Basic RAG** - A next-generation knowledge integration platform that provides intelligent routing, multi-source synthesis, and advanced AI capabilities through seamless integration with OpenWebUI.
+**Beyond Basic RAG** - A next-generation knowledge integration platform that provides intelligent routing, multi-source synthesis, advanced AI capabilities, and **enterprise-scale support case processing** through seamless integration with OpenWebUI.
+
+## 🚀 **NEW: Enterprise Support Case Processing**
+
+Transform thousands of diverse IBM support cases into actionable knowledge with:
+- **Intelligent Case Clustering** - Groups similar issues automatically
+- **Adaptive Pattern Recognition** - Handles varying case contexts and formats
+- **Historical Case Context** - Enhances responses with proven solutions
+- **Enterprise-Scale Processing** - Parallel processing for massive case collections
+- **Seamless Integration** - No workflow changes required for existing users
 
 ## 📋 Complete Setup Guide
 
@@ -87,7 +96,79 @@ mkdir -p data/case_studies/case_002/{documents,images,logs}
 └─────────────────┘    └──────────────────┘    └────────────────┘    └─────────────────┘
 ```
 
-## 🎯 What Happens Behind the Scenes
+## �️ System Architecture & Component Roles
+
+### **OpenWebUI → Knowledge Fusion Function → Gateway → CoreBackend**
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌────────────────┐    ┌─────────────────┐
+│   OpenWebUI     │───▶│ Knowledge Fusion │───▶│ API Gateway    │───▶│  CoreBackend    │
+│                 │    │   Function       │    │                │    │                │
+│ • User interface│    │ • Query routing  │    │ • Intelligence │    │ • Diagnostics   │
+│ • Chat UI       │    │ • Request format │    │ • Case matching│    │ • Pattern match │
+│ • File upload   │    │ • Error handling │    │ • Enhancement  │    │ • Vector search │
+│ • Response      │    │ • Status updates │    │ • Load balance │    │ • Knowledge KB  │
+└─────────────────┘    └──────────────────┘    └────────────────┘    └─────────────────┘
+```
+
+### **Component Responsibilities:**
+
+#### **🔗 Knowledge Fusion Function (`knowledge_fusion_function.py`)**
+- **Role:** OpenWebUI integration point
+- **What it does:**
+  - Receives user queries from OpenWebUI chat interface
+  - Routes requests to the API Gateway
+  - Handles connection errors and timeouts
+  - Provides real-time status updates to users
+  - Formats responses for OpenWebUI display
+
+#### **🚪 API Gateway (`knowledge_fusion_gateway.py`)**
+- **Role:** Intelligent routing and enhancement layer
+- **What it does:**
+  - **NEW:** Loads processed support cases for similarity matching
+  - **NEW:** Finds similar historical cases for each query
+  - **NEW:** Enhances requests with proven resolution patterns
+  - Routes enhanced requests to CoreBackend
+  - **NEW:** Adds clustering insights to responses
+  - Provides fallback handling between services
+
+#### **🧠 CoreBackend (`corebackend/implementation/backend/`)**
+- **Role:** Advanced diagnostic and analysis engine
+- **What it does:**
+  - **Diagnostic Analysis:** Pattern matching, hypothesis generation
+  - **Semantic Search:** Vector-based similarity search across documents
+  - **Knowledge Base Management:** Stores and retrieves cases, documents
+  - **Document Processing:** Ingests and processes support case files
+  - **Session Management:** Maintains conversation context
+  - **Multi-turn Conversations:** Refines diagnoses over multiple queries
+
+#### **📊 Enterprise Case Processor (`enterprise_case_processor.py`)**
+- **Role:** Batch processing system for thousands of support cases
+- **What it does:**
+  - **Parallel Processing:** ThreadPoolExecutor for enterprise scale
+  - **Adaptive Parsing:** Handles diverse JSON/TXT/CSV case formats
+  - **Quality Assessment:** Confidence scoring and validation
+  - **Error Handling:** Robust fallback mechanisms
+  - **Progress Tracking:** Real-time processing statistics
+
+#### **🔍 Case Clustering System (`simple_case_clustering.py`)**
+- **Role:** Intelligent case grouping and similarity analysis
+- **What it does:**
+  - **Case Clustering:** Groups similar support cases automatically
+  - **Pattern Recognition:** Identifies common service combinations
+  - **Resolution Analysis:** Ranks effectiveness of solution patterns
+  - **Similarity Matching:** Finds historical cases related to new queries
+  - **Insight Generation:** Provides actionable recommendations
+
+### **🔄 Enhanced Query Flow with New Intelligence:**
+
+```
+User Query → Function → Gateway (+ Smart Matching) → CoreBackend (+ Case Context) → Enhanced Response
+     ↑                              ↓                           ↓                           ↓
+📱 OpenWebUI              🧠 Historical Cases        🔍 Diagnostic Engine       ✨ Context-Rich Answer
+```
+
+## �🎯 What Happens Behind the Scenes
 
 ### When You Ask a Question:
 
@@ -140,6 +221,82 @@ data/
 └── documentation/            # Additional docs
 ```
 
+## 📊 **NEW: Support Case Processing Workflow**
+
+### **Step 1: Prepare Your Support Cases**
+
+```bash
+# Create support cases directory
+mkdir -p data/support_cases
+
+# Add your IBM support case files (JSON, TXT, or CSV format)
+# Examples:
+cp /path/to/your/cases/*.json data/support_cases/
+cp /path/to/your/cases/*.txt data/support_cases/
+```
+
+### **Step 2: Process Cases at Enterprise Scale**
+
+```bash
+# Process thousands of cases with parallel processing
+python enterprise_case_processor.py
+
+# Or process specific directory
+python enterprise_case_processor.py --input-dir data/support_cases --output enterprise_knowledge_base.json
+
+# Monitor processing with real-time progress
+python enterprise_case_processor.py --batch-size 50 --workers 8 --progress
+```
+
+### **Step 3: Analyze Case Patterns (Optional)**
+
+```bash
+# Run clustering analysis to understand case patterns
+python simple_case_clustering.py
+
+# View clustering results
+cat simple_case_clustering_analysis.json
+```
+
+### **What You Get:**
+
+#### **🔍 Intelligent Query Enhancement**
+When you ask: *"How to fix topology sync issues?"*
+
+**Before:** Generic troubleshooting steps
+
+**After:** 
+```
+How to fix topology sync issues...
+
+📊 Context from Similar Cases:
+Found 3 similar historical cases:
+• Case TS019888217: topology merge failing in OpenShift...
+• Case TS020145893: composite topology sync timeout...
+
+🎯 Common Resolution Patterns:
+• Apply hotfix image digest update  
+• Restart topology service pods
+• Update RBAC permissions
+
+🔧 Related Services: nasm-topology, ui-content, hdm-analytics
+```
+
+#### **📈 Processing Statistics**
+- **Thousands of cases** processed in parallel
+- **Adaptive parsing** handles diverse formats automatically
+- **Quality scoring** identifies cases needing better documentation
+- **Pattern recognition** finds common service combinations
+- **Resolution effectiveness** ranking based on historical success
+
+### **Supported Case Formats:**
+
+- **IBM Support Case JSON** - Direct export from IBM support systems
+- **Salesforce Case Export** - Standard Salesforce case format  
+- **Text Files** - Plain text case descriptions
+- **CSV Files** - Structured case data in spreadsheet format
+- **Mixed Formats** - Automatic format detection and processing
+
 ## ✅ Startup Checklist
 
 ### Services Running?
@@ -153,18 +310,102 @@ curl http://localhost:8080/health  # ✅ OpenWebUI
 ### Knowledge Sources Ready?
 - [ ] ASM repositories cloned in `data/asm_repositories/`
 - [ ] Case studies organized in `data/case_studies/`
+- [ ] **NEW:** Support cases added to `data/support_cases/`
 - [ ] Documentation added to `data/documentation/`
 - [ ] Knowledge Fusion function uploaded to OpenWebUI
+- [ ] **NEW:** Enterprise case processing completed (`enterprise_knowledge_base.json` exists)
 
 ### Test Your Setup
 In OpenWebUI, try these questions:
 - "What ASM services handle topology data?"
 - "How does Kafka message flow work in ASM?"
 - "Show me observer configuration patterns"
+- **NEW:** "How to fix topology sync issues?" *(tests support case integration)*
+- **NEW:** "What are common resolution patterns for performance issues?"*
 
-**Expected Response**: Detailed answers with ASM-specific context, code examples, and references to your actual repositories.
+**Expected Response**: Detailed answers with ASM-specific context, code examples, references to your actual repositories, **and historical case context with proven solutions**.
 
-## 🚨 Common Issues & Solutions
+## � **NEW: Project Structure with Enhanced Components**
+
+```
+📦 IBM Knowledge Fusion Platform
+├── 🔧 Core Components
+│   ├── knowledge_fusion_function.py          # OpenWebUI integration
+│   ├── knowledge_fusion_gateway.py          # Enhanced with case matching  
+│   └── corebackend/implementation/backend/   # Diagnostic engine
+│
+├── 🆕 Enterprise Case Processing  
+│   ├── enterprise_case_processor.py         # Batch processing system
+│   ├── case_clustering_system.py            # Advanced clustering (ML)
+│   ├── simple_case_clustering.py            # Basic clustering (built-in)
+│   ├── process_support_cases.py             # Case processing workflows
+│   └── test_case_extraction.py             # Testing & validation
+│
+├── 📊 Enhanced Knowledge Extraction
+│   ├── asm_knowledge_domains.yml           # Enhanced with case patterns
+│   ├── corebackend/.../knowledge_extractor.py  # Adaptive processing (+400 lines)
+│   └── corebackend/.../multi_source_manager.py # Case integration methods
+│
+├── 🗃️ Data Structure  
+│   ├── data/
+│   │   ├── asm_repositories/               # Your ASM codebases
+│   │   ├── case_studies/                   # Traditional case files  
+│   │   ├── support_cases/                  # 🆕 IBM support cases (JSON/TXT)
+│   │   └── documentation/                  # Additional docs
+│   │
+│   ├── 🆕 Generated Knowledge Bases
+│   │   ├── enterprise_knowledge_base.json   # Processed support cases
+│   │   ├── simple_case_clustering_analysis.json  # Clustering insights
+│   │   └── knowledge_base.json              # Core diagnostic KB
+│
+├── 🛠️ Management Scripts
+│   ├── bin/
+│   │   ├── start_server_mode.sh            # Start all services
+│   │   ├── setup_environments.sh           # Environment setup
+│   │   ├── manage_asm_repos.sh             # ASM repository management
+│   │   └── asm_knowledge_extractor.py      # Enhanced knowledge extraction
+│
+├── 📋 Configuration & Requirements
+│   ├── requirements.txt                    # Core dependencies
+│   ├── requirements_clustering.txt         # 🆕 ML clustering dependencies
+│   ├── asm_knowledge_domains.yml          # Enhanced pattern definitions
+│   └── scheduler_config.json              # Automated processing
+│
+└── 📚 Documentation
+    ├── README.md                          # This comprehensive guide
+    ├── docs/COMPLETE_DOCUMENTATION.md     # Full technical details
+    ├── docs/STARTUP_GUIDE.md             # Quick start guide
+    └── docs/CORE_BACKEND_TROUBLESHOOTING.md  # Troubleshooting
+```
+
+### **🆕 New Files Added:**
+
+#### **Enterprise Processing:**
+- `enterprise_case_processor.py` - **523 lines** of enterprise-scale batch processing
+- `case_clustering_system.py` - **661 lines** of advanced ML-based clustering  
+- `simple_case_clustering.py` - **533 lines** of clustering with built-in libraries
+- `requirements_clustering.txt` - Additional ML dependencies
+
+#### **Enhanced Core Systems:**
+- `knowledge_extractor.py` - **+400 lines** of adaptive case processing capabilities
+- `knowledge_fusion_gateway.py` - **+120 lines** of intelligent case matching
+- `asm_knowledge_domains.yml` - **+50 lines** of support case patterns
+
+#### **Testing & Validation:**
+- `test_case_extraction.py` - Comprehensive testing framework
+- `data/support_cases/case_TS019888217.json` - Sample IBM support case
+
+### **🎯 Capability Matrix:**
+
+| Component | Traditional | Enhanced | New Capabilities |
+|-----------|-------------|----------|-----------------|
+| **Knowledge Fusion** | Basic routing | ✅ Smart matching | Historical case context |
+| **Case Processing** | Manual | ✅ Enterprise batch | Thousands of cases, parallel processing |
+| **Pattern Recognition** | Static patterns | ✅ Adaptive patterns | 30+ services, 20+ error patterns |
+| **Clustering** | None | ✅ ML clustering | Automatic case grouping, similarity analysis |
+| **Response Quality** | Generic | ✅ Context-rich | Proven resolution patterns, related cases |
+
+## �🚨 Common Issues & Solutions
 
 **"Services won't start"**
 ```bash
