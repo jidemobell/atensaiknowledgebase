@@ -121,7 +121,7 @@ try:
     
     if not repo_paths:
         print('⚠️  No mappings configured yet')
-        return
+        exit(0)
     
     total_repos = 0
     for category, repos in repo_paths.items():
