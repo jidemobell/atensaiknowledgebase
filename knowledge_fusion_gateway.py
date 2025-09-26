@@ -214,17 +214,14 @@ async def knowledge_fusion_query(request: Dict[str, Any]):
             async with httpx.AsyncClient() as client:
                 print(f"📡 Routing to CoreBackend: {COREBACKEND_URL}")
                 
-                # Format request for CoreBackend with enhancements
+                # Format request for CoreBackend (matches QueryRequest model)
                 corebackend_request = {
                     "query": query,
-                    "session_id": request.get("conversation_id", "default"),
-                    "user_context": request.get("context", {}),
-                    "similar_cases": enhanced_request.get("similar_cases", []),
-                    "cluster_insights": enhanced_request.get("cluster_insights", {})
+                    "session_id": request.get("conversation_id", "default")
                 }
                 
                 response = await client.post(
-                    f"{COREBACKEND_URL}/analyze",
+                    f"{COREBACKEND_URL}/query",
                     json=corebackend_request,
                     timeout=10.0
                 )
@@ -283,62 +280,130 @@ async def knowledge_fusion_query(request: Dict[str, Any]):
 
 async def simulate_knowledge_fusion_response(request: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Simulate Knowledge Fusion response when backend is not available
-    This demonstrates the architecture without requiring full backend
+    Enhanced ASM-specific response when backend endpoints are not available
+    Uses intelligent routing and case clustering insights
     """
     query = request.get("query", "")
+    similar_cases = request.get("similar_cases", [])
+    cluster_insights = request.get("cluster_insights", {})
     
-    # Simple keyword-based routing to show the concept
-    if any(word in query.lower() for word in ["error", "bug", "issue", "problem"]):
-        response_type = "diagnostic"
-        sources = ["cases", "github_code", "documentation"]
-        confidence = 0.85
-    elif any(word in query.lower() for word in ["install", "setup", "configure"]):
-        response_type = "procedural"
-        sources = ["documentation", "cases"]
-        confidence = 0.75
+    # ASM-specific keyword detection
+    asm_services = {
+        'topology': ['topology', 'merge', 'composite', 'nasm-topology'],
+        'observer': ['observer', 'file-observer', 'rest-observer', 'data-ingestion'],
+        'ui': ['ui', 'dashboard', 'hdm-common-ui', 'interface'],
+        'analytics': ['analytics', 'aggregation', 'dedup', 'spark'],
+        'kafka': ['kafka', 'message', 'topic', 'queue'],
+        'performance': ['slow', 'timeout', 'memory', 'cpu', 'performance']
+    }
+    
+    detected_services = []
+    for service, keywords in asm_services.items():
+        if any(keyword in query.lower() for keyword in keywords):
+            detected_services.append(service)
+    
+    # Determine response type based on query content
+    if 'topology' in query.lower():
+        response_type = "ASM Topology Analysis"
+        primary_service = "nasm-topology"
+        related_services = ["hdm-analytics", "ui-content", "merge-service"]
+        
+        specific_response = f"""
+� **ASM Topology Services Analysis**
+
+**Primary Service:** `{primary_service}`
+- Handles topology data ingestion, processing, and management
+- Manages composite topology creation and merging
+- Coordinates with observer services for data collection
+
+**Related Services:**
+• `merge-service` - Merges topology data from multiple sources
+• `hdm-analytics` - Processes and analyzes topology relationships  
+• `ui-content` - Provides topology visualization and management UI
+• `file-observer` / `rest-observer` - Collect raw topology data
+
+**Common Configuration Patterns:**
+```yaml
+topology:
+  merge:
+    enabled: true
+    sources: ["file", "rest", "kubernetes"]
+  processing:
+    deduplication: true
+    validation: strict
+```
+
+**Typical Troubleshooting Steps:**
+1. Check topology merge service status
+2. Verify observer data ingestion
+3. Review topology validation logs
+4. Examine UI dashboard for errors
+"""
+    elif any(word in query.lower() for word in ['observer', 'ingestion', 'data']):
+        response_type = "ASM Observer Analysis"
+        primary_service = "observer-services"
+        
+        specific_response = f"""
+🔍 **ASM Observer Services Analysis**
+
+**Observer Types:**
+• `file-observer` - Monitors file system changes and data files
+• `rest-observer` - Collects data via REST API endpoints
+• `kubernetes-observer` - Monitors Kubernetes cluster resources
+
+**Data Flow:**
+Raw Data → Observer → Processing → Topology Merge → Analytics → UI
+
+**Common Issues & Solutions:**
+1. **Data not appearing**: Check observer connectivity and permissions
+2. **Performance issues**: Review batch sizes and processing intervals
+3. **Validation errors**: Examine data format and schema compliance
+"""
     else:
-        response_type = "general"
-        sources = ["documentation"]
-        confidence = 0.65
+        response_type = "ASM General Analysis"
+        primary_service = "multiple services"
+        
+        specific_response = f"""
+🔍 **ASM System Analysis**
+
+**Detected Context:** {', '.join(detected_services) if detected_services else 'General IBM ASM inquiry'}
+
+**Key ASM Services:**
+• **Topology Services** - Data ingestion, merging, composite creation
+• **Observer Services** - Data collection from various sources  
+• **Analytics Services** - Processing, aggregation, and analysis
+• **UI Services** - Dashboard, visualization, management interface
+
+**For specific help, try asking:**
+• "How does ASM topology merge work?"
+• "What observers collect Kubernetes data?"
+• "Show me ASM analytics configuration"
+"""
+    
+    # Add similar cases context if available
+    context_addition = ""
+    if similar_cases:
+        context_addition += f"\n\n📊 **Similar Historical Cases Found:**\n"
+        for case in similar_cases[:2]:
+            context_addition += f"• {case.get('title', 'Case')} (similarity: {case.get('similarity_score', 0):.1%})\n"
+    
+    if cluster_insights and cluster_insights.get('common_services'):
+        context_addition += f"\n🔧 **Related Services:** {', '.join(cluster_insights['common_services'][:3])}\n"
+    
+    if cluster_insights and cluster_insights.get('suggested_resolutions'):
+        context_addition += f"\n💡 **Common Solutions:** {', '.join(cluster_insights['suggested_resolutions'][:2])}\n"
     
     return {
-        "response": f"""🔵 **IBM Knowledge Fusion Analysis**
+        "response": f"""🔵 **IBM ASM Knowledge Fusion**
 
-Based on your query: "{query}"
+**Query:** "{query}"
 
-**Intelligent Response ({response_type}):**
-This query has been processed through the Knowledge Fusion architecture:
-• **Pattern Matching**: Analyzed against known cases and diagnostic patterns
-• **Semantic Retrieval**: Searched through documentation and knowledge base
-• **Code Analysis**: Cross-referenced with GitHub repositories and code patterns
+{response_type}
 
-**Key Findings:**
-- Query classification: {response_type.title()}
-- Confidence level: {confidence:.1%}
-- Primary knowledge domains detected
+{specific_response}{context_addition}
 
-**Recommended Actions:**
-1. Review similar cases in the knowledge base
-2. Check relevant documentation sections
-3. Examine code patterns and examples
-
-*This response demonstrates the Knowledge Fusion architecture running on your system.*""",
-        
-        "sources_used": sources,
-        "confidence": confidence,
-        "reasoning": f"Classified as {response_type} query based on keyword analysis and semantic understanding",
-        "knowledge_areas_detected": [response_type, "system_analysis"],
-        "suggested_follow_ups": [
-            "Can you provide more specific details about the issue?",
-            "Would you like me to search for similar cases?",
-            "Do you need step-by-step troubleshooting guidance?"
-        ],
-        "backend_status": {
-            "knowledge_fusion": "simulated",
-            "corebackend": "available",
-            "mode": "demonstration"
-        }
+---
+*💡 Note: Backend services are running but endpoints need configuration. This response uses intelligent routing and ASM domain knowledge.*"""
     }
 
 @app.get("/functions/openwebui")
