@@ -1,0 +1,186 @@
+# ASM (Agile Service Manager) Knowledge Domain Configuration
+# Focus areas for AI-powered analysis and knowledge extraction
+
+asm_knowledge_domains:
+  
+  # Core ASM Architecture & Data Flow
+  topology_management:
+    description: "Core topology data flow from observers to UI"
+    focus_areas:
+      - "Observer to Kafka message flow ({prefix}.topology.input.resources)"
+      - "Topology service resource processing and Cassandra writes"
+      - "Merge service composite resource creation"
+      - "Status service event generation and lifecycle integration"
+      - "Inventory service PostgreSQL synchronization"
+    code_patterns:
+      - "GraphDataHandler processing patterns"
+      - "Kafka topic naming conventions"
+      - "Resource create/replace/update/delete operations"
+      - "Tenant-based data ownership patterns"
+    key_technologies:
+      - "Apache Kafka"
+      - "Apache Cassandra"
+      - "PostgreSQL"
+      - "Graph database traversal"
+
+  # Observer Ecosystem
+  observer_architecture:
+    description: "Multi-platform observer system for data collection"
+    focus_areas:
+      - "Observer security and vulnerability management"
+      - "Observer versioning and hotfix processes"
+      - "Target system integration patterns"
+      - "Observer management artifacts and configurations"
+    supported_platforms:
+      - "Cloud: AWS, Azure, Google Cloud, IBM Cloud"
+      - "Monitoring: Datadog, Dynatrace, New Relic, AppDynamics"
+      - "Infrastructure: Kubernetes, OpenStack, VMware, Docker"
+      - "Network: Cisco ACI, Juniper CSO, Nokia CloudBand"
+      - "ITSM: ServiceNow, TADDM, Instana"
+    code_patterns:
+      - "Observer provisioning and deployment"
+      - "Configuration UI testing frameworks"
+      - "Observer-to-topology communication protocols"
+
+  # Service Architecture & Integration
+  microservices_architecture:
+    description: "ASM microservices ecosystem and integration patterns"
+    focus_areas:
+      - "Service-to-service communication via Kafka"
+      - "Database synchronization between Cassandra and PostgreSQL"
+      - "Status service and lifecycle integration"
+      - "UI API proxy patterns and backend routing"
+      - "Merge service composite resource algorithms"
+    services:
+      - "Topology Service (core graph management)"
+      - "Merge Service (resource deduplication)"
+      - "Inventory Service (PostgreSQL interface)"
+      - "Status Service (event generation)"
+      - "Lifecycle Service (alert correlation)"
+      - "UI API Service (frontend proxy)"
+    integration_patterns:
+      - "Kafka-based event streaming"
+      - "REST API inter-service communication"
+      - "Database consistency patterns"
+      - "Tenant-based multi-tenancy"
+
+  # Data Management & Storage
+  data_architecture:
+    description: "Dual database architecture and synchronization"
+    focus_areas:
+      - "Cassandra graph database schema and traversal"
+      - "PostgreSQL relational model for fast queries"
+      - "Data rebroadcast and synchronization crawlers"
+      - "Resource lifecycle management (TTL, expiration)"
+      - "Batch processing and transaction management"
+    storage_patterns:
+      - "Graph vertex and edge modeling in Cassandra"
+      - "SQL query optimization for resource search"
+      - "Data consistency between graph and relational models"
+      - "Temporal data management (beginTime/endTime)"
+    performance_considerations:
+      - "Batch processing optimization"
+      - "Query performance tuning"
+      - "Data synchronization efficiency"
+
+  # UI/UX Architecture
+  frontend_architecture:
+    description: "Modern JavaScript UI with Node.js backend"
+    focus_areas:
+      - "Single-page application (SPA) architecture"
+      - "Client-side JavaScript DOM manipulation"
+      - "REST API integration patterns"
+      - "Real-time data visualization"
+      - "Multi-tenant UI security"
+    technologies:
+      - "Node.js Express server"
+      - "Client-side JavaScript frameworks"
+      - "REST API proxy patterns"
+      - "Responsive web design"
+    ui_patterns:
+      - "Topology visualization components"
+      - "Resource search and filtering"
+      - "Alert and incident management interfaces"
+      - "Runbook automation UI"
+
+  # DevOps & Deployment
+  deployment_architecture:
+    description: "Kubernetes-based deployment and scaling"
+    focus_areas:
+      - "OpenShift/Kubernetes deployment patterns"
+      - "Helm chart configurations"
+      - "Service scaling and load balancing"
+      - "Configuration management"
+      - "Monitoring and logging strategies"
+    infrastructure_patterns:
+      - "Pod deployment strategies"
+      - "Service discovery and networking"
+      - "Persistent volume management"
+      - "Security and RBAC configurations"
+    operational_aspects:
+      - "Log aggregation and analysis"
+      - "Performance monitoring"
+      - "Disaster recovery procedures"
+      - "Upgrade and migration strategies"
+
+# Knowledge Extraction Priorities
+extraction_priorities:
+  high_priority:
+    - "Kafka topic design patterns and message flow"
+    - "Cassandra-PostgreSQL synchronization mechanisms"
+    - "Observer integration and configuration patterns"
+    - "Service-to-service communication protocols"
+    - "Data model consistency patterns"
+  
+  medium_priority:
+    - "UI component architecture and reusability"
+    - "Performance optimization techniques"
+    - "Error handling and resilience patterns"
+    - "Security and authentication mechanisms"
+    - "Testing frameworks and strategies"
+  
+  low_priority:
+    - "Legacy code compatibility"
+    - "Development environment setup"
+    - "Documentation generation tools"
+    - "Code style and formatting rules"
+
+# Analysis Techniques
+analysis_methods:
+  code_analysis:
+    - "Pattern recognition in service implementations"
+    - "API contract analysis and evolution"
+    - "Database schema evolution tracking"
+    - "Configuration template analysis"
+  
+  architecture_analysis:
+    - "Service dependency mapping"
+    - "Data flow diagram generation"
+    - "Performance bottleneck identification"
+    - "Scalability pattern recognition"
+  
+  integration_analysis:
+    - "Inter-service communication patterns"
+    - "Error propagation and handling"
+    - "Transaction boundary analysis"
+    - "Event sourcing and CQRS patterns"
+
+# Output Formats for Knowledge Base
+knowledge_outputs:
+  architectural_patterns:
+    - "Service interaction diagrams"
+    - "Data flow visualizations"
+    - "API integration guides"
+    - "Configuration templates"
+  
+  operational_guides:
+    - "Troubleshooting runbooks"
+    - "Performance tuning guides"
+    - "Deployment procedures"
+    - "Monitoring dashboards"
+  
+  development_resources:
+    - "Code examples and templates"
+    - "API documentation"
+    - "Testing strategies"
+    - "Best practices guidelines"

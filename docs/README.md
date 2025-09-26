@@ -33,18 +33,11 @@ This directory contains all documentation for the IBM Knowledge Fusion Platform,
 - **[Technical Architecture](planning/TECHNICAL_ARCHITECTURE.md)** - Technical design decisions
 - **[Quick Start](planning/QUICK_START.md)** - Development quick start guide
 - **[Research Papers](planning/RESEARCH_PAPERS.md)** - Related research and references
-- **[Technical Summary](planning/techsummary.md)** - High-level technical overview
-- **[Week by Week Plan](planning/weekbyweek.md)** - Development timeline
-- **[What's Next](planning/whatnext.md)** - Future development plans
-- **[UI Week Goal](planning/uiweekgoal.md)** - Frontend development goals
-- **[Cast Type](planning/casttype.md)** - Type system planning
 
 ### Reference Materials
 - **[Data Template](reference/datatemplate.md)** - Data structure templates
-- **[Idea Documentation](reference/idea.md)** - Core concepts and ideas
 - **[Index for Search](reference/indexforsearch.md)** - Search indexing reference
 - **[Query Examples](reference/queryexample.md)** - Sample queries and usage patterns
-- **[Salesforce Scraper](reference/salesforcescraper.md)** - Salesforce integration reference
 
 ## 📖 Documentation Categories
 

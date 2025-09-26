@@ -1,0 +1,12 @@
+# ASM Knowledge Extraction Requirements
+# Python dependencies for analyzing local ASM repositories
+
+# Core analysis libraries
+PyYAML>=6.0
+requests>=2.31.0
+
+# Optional: Enhanced analysis capabilities  
+# gitpython>=3.1.0  # For git repository analysis
+# nltk>=3.8         # For text processing
+# pandas>=2.0.0     # For data analysis
+# matplotlib>=3.6.0 # For visualization
