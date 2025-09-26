@@ -586,12 +586,44 @@ class KnowledgeExtractor:
         
         # Domain-specific patterns based on domain
         if domain:
-            if domain == 'topology':
+            if domain == 'core_services':
+                patterns['domain_specific'].extend(self._detect_core_services_patterns(data))
+            elif domain == 'topology':
                 patterns['domain_specific'].extend(self._detect_topology_patterns(data))
             elif domain == 'observers':
                 patterns['domain_specific'].extend(self._detect_observer_patterns(data))
             elif domain == 'ui':
                 patterns['domain_specific'].extend(self._detect_ui_patterns(data))
+        
+        return patterns
+    
+    def _detect_core_services_patterns(self, data: Dict[str, Any]) -> List[str]:
+        """Detect ASM core/backend services patterns"""
+        patterns = []
+        functions = ' '.join(data.get('functions', [])).lower()
+        dependencies = ' '.join(data.get('dependencies', [])).lower()
+        
+        # Backend service patterns
+        if 'service' in functions and ('topology' in functions or 'merge' in functions):
+            patterns.append('asm_backend_service_pattern')
+        
+        # Kafka integration patterns
+        if 'kafka' in dependencies or 'producer' in functions or 'consumer' in functions:
+            patterns.append('kafka_messaging_pattern')
+        
+        # Database patterns
+        if 'cassandra' in dependencies or 'cql' in functions:
+            patterns.append('cassandra_graph_pattern')
+        if 'postgresql' in dependencies or 'sql' in functions:
+            patterns.append('postgresql_relational_pattern')
+        
+        # ASM-specific service patterns
+        if 'merge' in functions and 'composite' in functions:
+            patterns.append('merge_service_pattern')
+        if 'status' in functions and 'event' in functions:
+            patterns.append('status_service_pattern')
+        if 'inventory' in functions:
+            patterns.append('inventory_service_pattern')
         
         return patterns
     

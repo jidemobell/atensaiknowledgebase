@@ -3,9 +3,9 @@
 
 asm_knowledge_domains:
   
-  # Core ASM Architecture & Data Flow
-  topology_management:
-    description: "Core topology data flow from observers to UI"
+  # ASM Core Services (Backend Services)
+  core_services:
+    description: "ASM core backend services - topology, merge, status, inventory services"
     focus_areas:
       - "Observer to Kafka message flow ({prefix}.topology.input.resources)"
       - "Topology service resource processing and Cassandra writes"
@@ -22,6 +22,25 @@ asm_knowledge_domains:
       - "Apache Cassandra"
       - "PostgreSQL"
       - "Graph database traversal"
+  
+  # Topology Management (Sub-domain of Core Services)
+  topology_management:
+    description: "Topology data flow orchestration and resource lifecycle management"
+    focus_areas:
+      - "Observer to Kafka message flow ({prefix}.topology.input.resources)"
+      - "Topology service resource processing and Cassandra writes"
+      - "Merge service composite resource creation"
+      - "Status service event generation and lifecycle integration"
+      - "Inventory service PostgreSQL synchronization"
+    core_services_involved:
+      - "Topology Service (primary resource processing)"
+      - "Merge Service (composite resource creation)"
+      - "Status Service (event lifecycle management)"
+      - "Inventory Service (relational data sync)"
+    data_flow_patterns:
+      - "Observer → Kafka → Topology Service → Cassandra"
+      - "Topology Service → Inventory Service → PostgreSQL"
+      - "Merge Service → Composite Resources → Status Events"
 
   # Observer Ecosystem
   observer_architecture:
