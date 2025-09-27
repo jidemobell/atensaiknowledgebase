@@ -80,7 +80,8 @@ class EnterpriseCaseProcessor:
     
     async def process_cases_directory(self, cases_dir: str, 
                                     output_file: str = None,
-                                    filters: Dict[str, Any] = None) -> Dict[str, Any]:
+                                    filters: Dict[str, Any] = None,
+                                    show_progress: bool = False) -> Dict[str, Any]:
         """Process thousands of cases with advanced filtering and batching"""
         
         start_time = time.time()
@@ -470,19 +471,33 @@ class EnterpriseCaseProcessor:
             self.logger.info(f"  • Errors: {error_file}")
 
 async def main():
-    """Main function for enterprise case processing"""
+    """Main processing function"""
+    import argparse
     
     print("🏢 IBM Enterprise Support Case Processing System")
-    print("="*60)
+    print("=" * 60)
     
-    # Configuration
-    cases_dir = "data/support_cases"
-    max_workers = 8  # Adjust based on your system
-    batch_size = 50  # Process 50 files at a time
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='Enterprise Support Case Processing System')
+    parser.add_argument('--input-dir', default='data/support_cases', 
+                       help='Directory containing support case files')
+    parser.add_argument('--output', default='enterprise_knowledge_base.json',
+                       help='Output file for processed knowledge base')
+    parser.add_argument('--progress', action='store_true',
+                       help='Show detailed progress information')
+    parser.add_argument('--batch-size', type=int, default=50,
+                       help='Number of files to process in each batch')
+    parser.add_argument('--workers', type=int, default=8,
+                       help='Number of worker threads')
     
-    # Check for custom directory
-    if len(sys.argv) > 1:
-        cases_dir = sys.argv[1]
+    args = parser.parse_args()
+    
+    # Configuration from arguments
+    cases_dir = args.input_dir
+    max_workers = args.workers
+    batch_size = args.batch_size
+    output_file = args.output
+    show_progress = args.progress
     
     # Initialize processor
     processor = EnterpriseCaseProcessor(max_workers=max_workers, batch_size=batch_size)
@@ -498,8 +513,9 @@ async def main():
     # Process cases
     results = await processor.process_cases_directory(
         cases_dir=cases_dir,
-        output_file="enterprise_knowledge_base.json",
-        filters=filters
+        output_file=output_file,
+        filters=filters,
+        show_progress=show_progress
     )
     
     # Display results
