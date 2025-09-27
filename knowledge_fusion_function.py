@@ -101,15 +101,24 @@ class Pipe:
             }
             
             async with aiohttp.ClientSession() as session:
+                # Try Phase 2 Multi-Agent intelligent routing first
                 async with session.post(
-                    f"{self.valves.GATEWAY_URL}/knowledge-fusion/query",
+                    f"{self.valves.GATEWAY_URL}/knowledge-fusion/intelligent",
                     json=request_data,
                     timeout=aiohttp.ClientTimeout(total=self.valves.TIMEOUT)
                 ) as response:
                     if response.status == 200:
                         result = await response.json()
-                        await self.emit_event_safe("✅ Knowledge Fusion response received")
+                        processing_mode = result.get("processing_details", {}).get("multi_agent_enabled", False)
+                        if processing_mode:
+                            await self.emit_event_safe("🤖 Multi-Agent Intelligence response received")
+                        else:
+                            await self.emit_event_safe("✅ Knowledge Fusion response received")
                         return result.get("response", "No response from Knowledge Fusion")
+                    elif response.status == 404:
+                        # Multi-agent endpoint not available, fall back to standard processing
+                        await self.emit_event_safe("🔄 Multi-agent not available, using standard processing...")
+                        return await self._fallback_to_standard_processing(request_data)
                     else:
                         await self.emit_event_safe(f"⚠️ Gateway returned status {response.status}")
                         return f"🔧 Knowledge Fusion temporarily unavailable (status: {response.status})\n\nPlease check if the Knowledge Fusion Gateway is running on port 9000."
@@ -125,4 +134,22 @@ class Pipe:
         except Exception as e:
             await self.emit_event_safe(f"❌ Error: {str(e)}")
             return f"❌ Knowledge Fusion error: {str(e)}\n\nPlease contact system administrator if this persists."
+    
+    async def _fallback_to_standard_processing(self, request_data):
+        """Fallback to standard Phase 1 processing when multi-agent is unavailable"""
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    f"{self.valves.GATEWAY_URL}/knowledge-fusion/query",
+                    json=request_data,
+                    timeout=aiohttp.ClientTimeout(total=self.valves.TIMEOUT)
+                ) as response:
+                    if response.status == 200:
+                        result = await response.json()
+                        await self.emit_event_safe("✅ Standard processing response received")
+                        return result.get("response", "No response from Knowledge Fusion")
+                    else:
+                        return f"🔧 Knowledge Fusion unavailable (status: {response.status})"
+        except Exception as e:
+            return f"❌ Fallback processing failed: {str(e)}"
 
