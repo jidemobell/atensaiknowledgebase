@@ -1,0 +1,63 @@
+UI Content Service Performance Issue
+
+Issue Summary:
+UI dashboard experiencing slow load times and intermittent failures when displaying large topology graphs.
+Users reporting 10-15 second delays for topology visualization.
+
+Technical Details:
+- Service: ui-content v1.8.0
+- Load: 500+ concurrent users
+- Topology size: 2000+ nodes, 5000+ relationships
+- Database: Cassandra 3.11
+
+Performance Metrics:
+- Average response time: 12.5 seconds
+- P95 response time: 18.2 seconds
+- Error rate: 5.2%
+- Memory usage: 85% of 4GB limit
+
+Investigation Process:
+1. Profiled application performance - found inefficient graph queries
+2. Analyzed database query patterns - N+1 query problem identified
+3. Reviewed caching strategy - cache hit rate only 23%
+4. Examined network patterns - multiple redundant API calls
+
+Optimizations Implemented:
+1. Batch graph queries to reduce database round trips
+2. Implemented intelligent query caching with 2-hour TTL
+3. Added graph data pagination for large topologies
+4. Optimized frontend rendering with virtual scrolling
+
+Database Query Optimization:
+```sql
+-- Before: Multiple individual queries
+SELECT * FROM topology_nodes WHERE id = ?
+-- After: Single batch query
+SELECT * FROM topology_nodes WHERE id IN (?, ?, ?, ...)
+```
+
+Caching Strategy:
+```yaml
+cache:
+  topology_data:
+    ttl: 7200s
+    max_size: 1000
+  graph_layouts:
+    ttl: 3600s
+    max_size: 500
+```
+
+Results After Optimization:
+- Average response time: 2.1 seconds (83% improvement)
+- P95 response time: 3.8 seconds (79% improvement)
+- Error rate: 0.3% (94% improvement)
+- Cache hit rate: 78% (240% improvement)
+- Memory usage: 62% of limit
+
+User Feedback:
+- Dashboard loads much faster
+- Large topology graphs render smoothly
+- No more timeout errors reported
+- Positive feedback on responsiveness
+
+Related Services: cassandra-cluster, api-gateway, topology-processor

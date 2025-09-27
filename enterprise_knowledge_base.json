@@ -1,0 +1,81 @@
+{
+  "metadata": {
+    "processing_timestamp": "2025-09-28T00:09:24.997036",
+    "total_cases_processed": 2,
+    "processing_stats": {
+      "total_files": 2,
+      "processed_successfully": 2,
+      "failed_processing": 0,
+      "skipped_files": 0,
+      "total_size_mb": 0.0033216476440429688,
+      "processing_time_seconds": 0.001661062240600586,
+      "errors": []
+    },
+    "analysis_summary": {
+      "total_cases": 2,
+      "processing_stats": {
+        "average_confidence": 0.2,
+        "high_confidence_cases": 0,
+        "low_confidence_cases": 2
+      },
+      "service_analysis": {
+        "total_services_mentioned": 3,
+        "unique_services": 2,
+        "top_services": [
+          [
+            "topology",
+            2
+          ],
+          [
+            "kafka",
+            1
+          ]
+        ]
+      },
+      "category_analysis": {
+        "categories_distribution": {
+          "unknown": 2
+        },
+        "most_common_category": [
+          "unknown",
+          2
+        ]
+      },
+      "severity_analysis": {
+        "Unknown": 2
+      },
+      "processing_analysis": {
+        "lightweight": 2
+      }
+    }
+  },
+  "cases": [
+    {
+      "case_number": "unknown",
+      "title": "Case from topology_sync_issue.txt",
+      "word_count": 231,
+      "services": [
+        "topology",
+        "kafka"
+      ],
+      "source_file": "data/case_studies/case_001/documents/topology_sync_issue.txt",
+      "file_type": "text",
+      "confidence": 0.2,
+      "processing_method": "lightweight",
+      "content_preview": "ASM Topology Sync Issue - Case Study\n\nProblem Description:\nTopology merge service experiencing timeout errors after 30 seconds during sync operations.\nHigh Kafka consumer lag detected on topology.merg..."
+    },
+    {
+      "case_number": "unknown",
+      "title": "Case from ui_performance_issue.txt",
+      "word_count": 266,
+      "services": [
+        "topology"
+      ],
+      "source_file": "data/case_studies/case_002/documents/ui_performance_issue.txt",
+      "file_type": "text",
+      "confidence": 0.2,
+      "processing_method": "lightweight",
+      "content_preview": "UI Content Service Performance Issue\n\nIssue Summary:\nUI dashboard experiencing slow load times and intermittent failures when displaying large topology graphs.\nUsers reporting 10-15 second delays for ..."
+    }
+  ]
+}

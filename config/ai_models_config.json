@@ -1,0 +1,119 @@
+{
+  "version": "2.0",
+  "description": "AI Model Configuration for Knowledge Fusion Platform",
+  "updated": "2025-09-28",
+  
+  "model_profiles": {
+    "maximum_intelligence": {
+      "description": "Best possible intelligence, highest resource usage",
+      "primary_llm": "llama3.1:70b",
+      "code_specialist": "codellama:34b", 
+      "embedding_model": "nomic-embed-text",
+      "backup_llm": "llama3.1:8b",
+      "vision_model": "llama3.2-vision:11b",
+      "recommended_for": ["enterprise", "complex_reasoning", "multi_agent_processing"],
+      "min_ram": "64GB",
+      "estimated_performance": "100%"
+    },
+    
+    "balanced_performance": {
+      "description": "Optimal balance of intelligence and efficiency", 
+      "primary_llm": "llama3.1:8b",
+      "code_specialist": "codellama:13b",
+      "embedding_model": "nomic-embed-text", 
+      "backup_llm": "mistral:7b",
+      "vision_model": "granite3.2-vision:2b",
+      "recommended_for": ["development", "standard_usage", "most_users"],
+      "min_ram": "16GB",
+      "estimated_performance": "85%"
+    },
+    
+    "granite_optimized": {
+      "description": "Optimized for your current Granite models",
+      "primary_llm": "granite3.2:8b-instruct-q8.0",
+      "code_specialist": "granite3.2:8b",
+      "embedding_model": "nomic-embed-text",
+      "backup_llm": "granite3.2:8b",
+      "vision_model": "granite3.2-vision:2b", 
+      "recommended_for": ["granite_users", "ibm_enterprise", "existing_setup"],
+      "min_ram": "12GB",
+      "estimated_performance": "80%"
+    },
+    
+    "efficient_setup": {
+      "description": "Lightweight but intelligent configuration",
+      "primary_llm": "llama3.1:8b",
+      "code_specialist": "codellama:7b",
+      "embedding_model": "nomic-embed-text",
+      "backup_llm": "phi3:3.8b",
+      "vision_model": "granite3.2-vision:2b",
+      "recommended_for": ["limited_resources", "development", "testing"],
+      "min_ram": "8GB", 
+      "estimated_performance": "70%"
+    }
+  },
+
+  "model_capabilities": {
+    "llama3.1:70b": {
+      "reasoning": 95,
+      "code_understanding": 90,
+      "knowledge_synthesis": 95,
+      "multi_agent_coordination": 95,
+      "asm_domain_knowledge": 85
+    },
+    "llama3.1:8b": {
+      "reasoning": 85,
+      "code_understanding": 80,
+      "knowledge_synthesis": 85, 
+      "multi_agent_coordination": 80,
+      "asm_domain_knowledge": 75
+    },
+    "granite3.2:8b-instruct-q8.0": {
+      "reasoning": 80,
+      "code_understanding": 85,
+      "knowledge_synthesis": 80,
+      "multi_agent_coordination": 75,
+      "asm_domain_knowledge": 90
+    },
+    "codellama:34b": {
+      "reasoning": 80,
+      "code_understanding": 95,
+      "knowledge_synthesis": 75,
+      "multi_agent_coordination": 70,
+      "asm_domain_knowledge": 85
+    },
+    "codellama:13b": {
+      "reasoning": 75,
+      "code_understanding": 90,
+      "knowledge_synthesis": 70,
+      "multi_agent_coordination": 65,
+      "asm_domain_knowledge": 80
+    }
+  },
+
+  "active_profile": "balanced_performance",
+  
+  "ollama_configuration": {
+    "base_url": "http://localhost:11434",
+    "timeout": 300,
+    "max_retries": 3,
+    "temperature": 0.3,
+    "context_window": 4096,
+    "streaming": true
+  },
+
+  "embedding_configuration": {
+    "model": "nomic-embed-text",
+    "dimensions": 768,
+    "batch_size": 32,
+    "fallback_to_sentence_transformers": true,
+    "sentence_transformers_model": "all-MiniLM-L6-v2"
+  },
+
+  "multi_agent_routing": {
+    "topology_agent_model": "granite3.2:8b-instruct-q8.0",
+    "case_analysis_model": "llama3.1:8b", 
+    "github_agent_model": "codellama:13b",
+    "synthesis_model": "llama3.1:8b"
+  }
+}

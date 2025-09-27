@@ -1,0 +1,54 @@
+ASM Topology Sync Issue - Case Study
+
+Problem Description:
+Topology merge service experiencing timeout errors after 30 seconds during sync operations.
+High Kafka consumer lag detected on topology.merge.events topic.
+
+Environment:
+- OpenShift 4.12
+- ASM Version: 1.8.2
+- Kafka Cluster: 3 brokers
+- merge-service pods: 2 replicas
+
+Symptoms:
+- Service timeouts after exactly 30 seconds
+- Kafka consumer lag increasing over time
+- UI dashboard showing stale topology data
+- Error logs showing "Connection timeout to merge service"
+
+Investigation Steps:
+1. Checked merge service logs - found timeout configuration issue
+2. Analyzed Kafka consumer group lag - 500+ messages behind
+3. Reviewed service resource limits - CPU throttling detected
+4. Examined network connectivity between services - intermittent failures
+
+Root Cause:
+The merge service timeout configuration was set to 30 seconds, but Kafka message processing
+was taking longer due to CPU throttling and network latency issues.
+
+Resolution:
+1. Increased merge service timeout from 30s to 60s
+2. Updated CPU limits from 500m to 1000m
+3. Added network policy to improve service communication
+4. Implemented retry logic for failed merge operations
+
+Configuration Changes:
+```yaml
+merge-service:
+  timeout: 60s
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  retry:
+    maxAttempts: 3
+    backoff: exponential
+```
+
+Outcome:
+- Sync operations completing successfully
+- Kafka consumer lag reduced to < 10 messages
+- UI dashboard showing real-time topology updates
+- No more timeout errors in logs
+
+Related Services: nasm-topology, ui-content, kafka-cluster

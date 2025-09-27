@@ -4,6 +4,7 @@ Combines pattern matching with semantic search and document intelligence
 """
 
 import json
+import sys
 from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -58,14 +59,37 @@ class EnhancedDiagnosticAgent:
     def __init__(self, knowledge_base_path: str = "knowledge_base.json"):
         """Initialize the enhanced diagnostic agent"""
         
-        # Initialize embeddings if available
+        # Initialize AI Model Manager for optimal model selection
+        try:
+            from pathlib import Path
+            config_path = Path(__file__).parent.parent.parent / "config" / "ai_models_config.json"
+            sys.path.append(str(Path(__file__).parent.parent.parent / "config"))
+            from ai_model_manager import AIModelManager
+            self.model_manager = AIModelManager(config_path)
+            print("🤖 AI Model Manager initialized")
+        except Exception as e:
+            print(f"Warning: AI Model Manager not available: {e}")
+            self.model_manager = None
+        
+        # Initialize embeddings with optimal model
+        embedding_model = "all-MiniLM-L6-v2"  # fallback
+        if self.model_manager:
+            embedding_model = self.model_manager.get_model_for_task("embedding")
+            if embedding_model == "nomic-embed-text":
+                print(f"🎯 Using optimal embedding model: {embedding_model}")
+        
         if EMBEDDINGS_AVAILABLE:
             try:
-                self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
-                print("Loaded sentence transformer model")
+                self.embedder = SentenceTransformer(embedding_model)
+                print(f"✅ Loaded embedding model: {embedding_model}")
             except Exception as e:
-                print(f"Warning: Could not load embeddings: {e}")
-                self.embedder = None
+                print(f"Warning: Could not load {embedding_model}, falling back to all-MiniLM-L6-v2: {e}")
+                try:
+                    self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+                    print("✅ Loaded fallback embedding model")
+                except Exception as e2:
+                    print(f"Warning: Could not load any embeddings: {e2}")
+                    self.embedder = None
         else:
             self.embedder = None
             print("Warning: sentence-transformers not available")

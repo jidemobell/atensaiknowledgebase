@@ -1,0 +1,37 @@
+{
+  "total_cases": 2,
+  "processing_stats": {
+    "average_confidence": 0.2,
+    "high_confidence_cases": 0,
+    "low_confidence_cases": 2
+  },
+  "service_analysis": {
+    "total_services_mentioned": 3,
+    "unique_services": 2,
+    "top_services": [
+      [
+        "topology",
+        2
+      ],
+      [
+        "kafka",
+        1
+      ]
+    ]
+  },
+  "category_analysis": {
+    "categories_distribution": {
+      "unknown": 2
+    },
+    "most_common_category": [
+      "unknown",
+      2
+    ]
+  },
+  "severity_analysis": {
+    "Unknown": 2
+  },
+  "processing_analysis": {
+    "lightweight": 2
+  }
+}

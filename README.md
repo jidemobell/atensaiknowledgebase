@@ -34,7 +34,16 @@ cd atensaiknowledgebase
 # 2. Setup virtual environments (auto-creates if missing)
 ./bin/setup_environments.sh
 
-# 3. Start all Knowledge Fusion services
+# 3. Configure AI models for maximum intelligence
+./bin/manage_ai_models.sh recommend  # See model recommendations
+ollama pull llama3.1:8b              # Best reasoning model
+ollama pull codellama:13b            # Superior code analysis
+ollama pull nomic-embed-text         # Essential for semantic search
+
+# 4. Configure optimal model setup
+./bin/manage_ai_models.sh configure balanced_performance
+
+# 5. Start all Knowledge Fusion services
 ./bin/start_server_mode.sh
 ```
 
@@ -676,7 +685,20 @@ Think of it like:
 **The Intelligence Layer**: Provides advanced knowledge synthesis and multi-source reasoning.
 
 ### 4. Ollama Integration (Port 11434)
-**The AI Engine**: Provides local LLM capabilities with models like Llama2, CodeLlama, and custom models.
+**The AI Engine**: Provides local LLM capabilities with optimized models for maximum intelligence.
+
+**🎯 Recommended Model Setup:**
+```bash
+# For maximum intelligence with your current system:
+ollama pull llama3.1:8b        # Best reasoning & synthesis
+ollama pull codellama:13b      # Superior code analysis
+ollama pull nomic-embed-text   # Essential for semantic search
+
+# Configure optimal setup:
+./bin/manage_ai_models.sh configure balanced_performance
+```
+
+Your current Granite models (`granite3.2:8b-instruct-q8.0`, `granite3.2-vision:2b`) provide excellent IBM domain knowledge and work perfectly with the platform!
 
 ## Integration Methods
 
