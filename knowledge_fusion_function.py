@@ -86,7 +86,7 @@ class Pipe:
         except (KeyError, IndexError):
             return "❌ No message content found."
 
-        await self.emit_event_safe("🔍 Routing query to Knowledge Fusion Gateway...")
+        # await self.emit_event_safe("🔍 Routing query to Knowledge Fusion Gateway...")
             
         try:
             request_data = {
@@ -109,30 +109,30 @@ class Pipe:
                 ) as response:
                     if response.status == 200:
                         result = await response.json()
-                        processing_mode = result.get("processing_details", {}).get("multi_agent_enabled", False)
-                        if processing_mode:
-                            await self.emit_event_safe("🤖 Multi-Agent Intelligence response received")
-                        else:
-                            await self.emit_event_safe("✅ Knowledge Fusion response received")
+                        # processing_mode = result.get("processing_details", {}).get("multi_agent_enabled", False)
+                        # if processing_mode:
+                        #     await self.emit_event_safe("🤖 Multi-Agent Intelligence response received")
+                        # else:
+                        #     await self.emit_event_safe("✅ Knowledge Fusion response received")
                         return result.get("response", "No response from Knowledge Fusion")
                     elif response.status == 404:
                         # Multi-agent endpoint not available, fall back to standard processing
-                        await self.emit_event_safe("🔄 Multi-agent not available, using standard processing...")
+                        # await self.emit_event_safe("🔄 Multi-agent not available, using standard processing...")
                         return await self._fallback_to_standard_processing(request_data)
                     else:
-                        await self.emit_event_safe(f"⚠️ Gateway returned status {response.status}")
+                        # await self.emit_event_safe(f"⚠️ Gateway returned status {response.status}")
                         return f"🔧 Knowledge Fusion temporarily unavailable (status: {response.status})\n\nPlease check if the Knowledge Fusion Gateway is running on port 9000."
                         
         except aiohttp.ClientTimeout:
-            await self.emit_event_safe("⏱️ Request timed out")
+            # await self.emit_event_safe("⏱️ Request timed out")
             return f"⏱️ Knowledge Fusion request timed out after {self.valves.TIMEOUT} seconds.\n\nPlease try again or check the gateway status."
             
         except aiohttp.ClientConnectorError:
-            await self.emit_event_safe("🔌 Connection failed")
+            # await self.emit_event_safe("🔌 Connection failed")
             return f"🔌 Cannot connect to Knowledge Fusion Gateway at {self.valves.GATEWAY_URL}\n\nPlease ensure the gateway is running on port 9000."
             
         except Exception as e:
-            await self.emit_event_safe(f"❌ Error: {str(e)}")
+            # await self.emit_event_safe(f"❌ Error: {str(e)}")
             return f"❌ Knowledge Fusion error: {str(e)}\n\nPlease contact system administrator if this persists."
     
     async def _fallback_to_standard_processing(self, request_data):
@@ -146,7 +146,7 @@ class Pipe:
                 ) as response:
                     if response.status == 200:
                         result = await response.json()
-                        await self.emit_event_safe("✅ Standard processing response received")
+                        # await self.emit_event_safe("✅ Standard processing response received")
                         return result.get("response", "No response from Knowledge Fusion")
                     else:
                         return f"🔧 Knowledge Fusion unavailable (status: {response.status})"

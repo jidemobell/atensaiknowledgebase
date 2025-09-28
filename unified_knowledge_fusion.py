@@ -230,12 +230,18 @@ RESPONSE:"""
                     if response.status == 200:
                         result = await response.json()
                         ai_response = result.get("response", "").strip()
-                        if ai_response:
+                        if ai_response and len(ai_response) > 20:  # Ensure substantial response
                             logger.info("✅ Granite AI synthesis completed")
                             return ai_response
+                        else:
+                            logger.warning("Granite returned empty/short response, using fallback")
+                    else:
+                        logger.warning(f"Granite returned status {response.status}")
                             
+        except asyncio.TimeoutError:
+            logger.error("Granite synthesis timeout - model may be busy")
         except Exception as e:
-            logger.error(f"Granite synthesis error: {e}")
+            logger.error(f"Granite synthesis error: {str(e)}")
         
         return ""
     
@@ -308,6 +314,48 @@ I combine technical analysis with AI synthesis to provide comprehensive ASM guid
 • Integration patterns and data flow analysis
 
 What specific ASM challenge can I help you with?"""
+        
+        # Specific ASM sync question handling
+        if 'sync' in query_lower and any(word in query_lower for word in ['kubernetes', 'k8s', 'asm']):
+            return """**ASM Sync in Kubernetes Environments**
+
+ASM topology synchronization in Kubernetes works through several key components:
+
+**🔄 Sync Architecture:**
+• **kubernetes-observer**: Monitors K8s cluster resources and events
+• **nasm-topology**: Processes and correlates topology data
+• **merge-service**: Synchronizes data from multiple sources
+• **ui-content**: Provides real-time dashboard updates
+
+**📊 Sync Process:**
+1. **Data Collection**: kubernetes-observer watches K8s API for changes
+2. **Processing**: nasm-topology processes resource relationships  
+3. **Merging**: merge-service combines data from observers
+4. **Storage**: Topology data stored in ASM knowledge base
+5. **Visualization**: ui-content displays synchronized topology
+
+**⚙️ Key Configuration:**
+```yaml
+observers:
+  kubernetes-observer:
+    cluster_url: "https://kubernetes.default.svc"
+    sync_interval: "30s"
+    watch_namespaces: ["default", "asm-system"]
+```
+
+**🔧 Common Sync Issues:**
+• RBAC permissions for kubernetes-observer
+• Network connectivity to K8s API server
+• Resource quotas and rate limiting
+• Merge conflicts with multiple data sources
+
+**📋 Troubleshooting Steps:**
+1. Check kubernetes-observer pod status: `oc get pods -l app=kubernetes-observer`
+2. Verify service account permissions: `oc get clusterrolebinding`
+3. Review sync logs: `oc logs -f deployment/kubernetes-observer`
+4. Monitor merge service: `oc logs -f deployment/nasm-topology`
+
+Would you like me to elaborate on any specific aspect of ASM sync configuration?"""
         
         # Domain-specific fallbacks
         domain = self._detect_asm_domain(query)
