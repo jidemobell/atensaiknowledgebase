@@ -40,16 +40,44 @@ fi
 echo "✅ Models ready"
 
 # Set environment variables for AI integration
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 export OLLAMA_BASE_URL="http://localhost:11434"
 export ENABLE_EMBEDDINGS="true"
-export AI_MODEL_CONFIG="/Users/jidemobell/Documents/IBMALL/TOPOLOGYKNOWLEDGE/config/ai_models_config.json"
+export AI_MODEL_CONFIG="$PROJECT_ROOT/config/ai_models_config.json"
 
 # Start Core Backend with full AI capabilities
 echo "🚀 Starting Core Backend with AI models..."
-cd /Users/jidemobell/Documents/IBMALL/TOPOLOGYKNOWLEDGE/corebackend/implementation/backend
+
+# Get the current project root dynamically
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CORE_BACKEND_PATH="$PROJECT_ROOT/corebackend/implementation/backend"
+
+if [ -d "$CORE_BACKEND_PATH" ]; then
+    cd "$CORE_BACKEND_PATH"
+    echo "✅ Found Core Backend at: $CORE_BACKEND_PATH"
+else
+    echo "❌ Core Backend path not found: $CORE_BACKEND_PATH"
+    echo "🔍 Looking for main.py in project..."
+    
+    # Search for main.py files
+    if [ -f "$PROJECT_ROOT/corebackend/implementation/backend/main.py" ]; then
+        cd "$PROJECT_ROOT/corebackend/implementation/backend"
+        echo "✅ Using: main.py"
+    elif [ -f "$PROJECT_ROOT/corebackend/implementation/backend/main_enhanced.py" ]; then
+        cd "$PROJECT_ROOT/corebackend/implementation/backend"
+        echo "✅ Using: main_enhanced.py (will rename to main.py)"
+        cp main_enhanced.py main.py
+    else
+        echo "❌ Could not find main.py or main_enhanced.py. Please check your project structure."
+        ls -la "$PROJECT_ROOT/corebackend/implementation/backend/main*.py"
+        exit 1
+    fi
+fi
 
 # Install requirements if needed
-pip install -q sentence-transformers requests ollama-python 2>/dev/null || true
+echo "📦 Installing AI dependencies..."
+pip install sentence-transformers==2.2.2 numpy requests aiohttp fastapi uvicorn pydantic 2>/dev/null || true
+echo "✅ Dependencies installed"
 
 # Start with AI models enabled
 python3 -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload &
