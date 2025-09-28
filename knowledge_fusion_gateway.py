@@ -369,52 +369,46 @@ async def knowledge_fusion_query(request: Dict[str, Any]):
         
         if is_simple_query:
             print(f"🎯 Simple query detected: '{query}' -> routing directly to AI-enabled Core Backend")
-            # Route directly to CoreBackend for simple queries
+            # Route to Unified Knowledge Fusion for simple queries (it will handle Core Backend integration)
             try:
                 async with httpx.AsyncClient() as client:
-                    print(f"📡 Routing to CoreBackend: {COREBACKEND_URL}")
-                    
-                    # Format request for CoreBackend (matches QueryRequest model)
-                    corebackend_request = {
-                        "query": query,
-                        "session_id": request.get("conversation_id", "default")
-                    }
+                    print(f"📡 Routing simple query to Unified Knowledge Fusion: {KNOWLEDGE_FUSION_URL}")
                     
                     response = await client.post(
-                        f"{COREBACKEND_URL}/query",
-                        json=corebackend_request,
-                        timeout=10.0
+                        f"{KNOWLEDGE_FUSION_URL}/unified-fusion",
+                        json=enhanced_request,
+                        timeout=15.0
                     )
                     
                     if response.status_code == 200:
-                        core_result = response.json()
-                        print("✅ CoreBackend (AI) responded successfully")
-                        return core_result
+                        unified_result = response.json()
+                        print("✅ Unified Knowledge Fusion (simple query) responded successfully")
+                        return unified_result
                     else:
-                        print(f"⚠️ CoreBackend returned {response.status_code}")
+                        print(f"⚠️ Unified Knowledge Fusion returned {response.status_code}")
                         
-            except Exception as core_error:
-                print(f"⚠️ CoreBackend error: {core_error}")
+            except Exception as unified_error:
+                print(f"⚠️ Unified Knowledge Fusion error: {unified_error}")
         
-        # For complex queries, try Knowledge Fusion backend first
+        # For complex queries, try Unified Knowledge Fusion first
         try:
             async with httpx.AsyncClient() as client:
-                print(f"📡 Routing to Knowledge Fusion Backend: {KNOWLEDGE_FUSION_URL}")
+                print(f"📡 Routing to Unified Knowledge Fusion: {KNOWLEDGE_FUSION_URL}")
                 response = await client.post(
-                    f"{KNOWLEDGE_FUSION_URL}/knowledge-fusion/query",
+                    f"{KNOWLEDGE_FUSION_URL}/unified-fusion",
                     json=enhanced_request,  # Send enhanced request
-                    timeout=10.0
+                    timeout=15.0
                 )
                 
                 if response.status_code == 200:
                     result = response.json()
-                    print("✅ Knowledge Fusion Backend responded successfully")
+                    print("✅ Unified Knowledge Fusion responded successfully")
                     return result
                 else:
-                    print(f"⚠️ Knowledge Fusion Backend returned {response.status_code}")
+                    print(f"⚠️ Unified Knowledge Fusion returned {response.status_code}")
                     
         except Exception as kf_error:
-            print(f"⚠️ Knowledge Fusion Backend error: {kf_error}")
+            print(f"⚠️ Unified Knowledge Fusion error: {kf_error}")
         
         # Try CoreBackend as final fallback
         try:
