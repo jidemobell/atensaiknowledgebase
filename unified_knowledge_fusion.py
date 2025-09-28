@@ -124,28 +124,48 @@ class UnifiedKnowledgeFusionEngine:
         )
     
     async def _get_core_backend_analysis(self, request: UnifiedQueryRequest) -> Dict[str, Any]:
-        """Get analysis from Core Backend AI system"""
+        """Get analysis with case search from Core Backend AI system"""
         try:
             async with aiohttp.ClientSession() as session:
-                core_request = {
+                # Use the unified search endpoint for proper case retrieval
+                search_request = {
                     "query": request.query,
-                    "session_id": request.conversation_id or "unified"
+                    "search_mode": "all",  # Search across all knowledge sources
+                    "session_id": request.conversation_id or "unified",
+                    "filters": {}
                 }
                 
                 async with session.post(
-                    f"{CORE_BACKEND_URL}/query",
-                    json=core_request,
-                    timeout=aiohttp.ClientTimeout(total=15)
+                    f"{CORE_BACKEND_URL}/api/search",
+                    json=search_request,
+                    timeout=aiohttp.ClientTimeout(total=20)
                 ) as response:
                     if response.status == 200:
                         result = await response.json()
-                        logger.info("✅ Core Backend analysis received")
-                        return result
+                        logger.info(f"✅ Core Backend search received: {result.get('total_results', 0)} results")
+                        
+                        # Format the search results into analysis format
+                        formatted_result = {
+                            "query": request.query,
+                            "total_results": result.get('total_results', 0),
+                            "case_results": result.get('case_results', []),
+                            "code_results": result.get('code_results', []),
+                            "doc_results": result.get('doc_results', []),
+                            "suggestions": result.get('suggestions', []),
+                            "confidence": min(0.9, result.get('total_results', 0) * 0.1),  # Higher confidence with more results
+                            "search_metadata": {
+                                "search_mode": "unified",
+                                "has_case_matches": len(result.get('case_results', [])) > 0,
+                                "has_code_matches": len(result.get('code_results', [])) > 0,
+                                "has_doc_matches": len(result.get('doc_results', [])) > 0
+                            }
+                        }
+                        return formatted_result
                     else:
-                        logger.warning(f"Core Backend returned {response.status}")
+                        logger.warning(f"Core Backend search returned {response.status}")
                         
         except Exception as e:
-            logger.error(f"Core Backend error: {e}")
+            logger.error(f"Core Backend search error: {e}")
         
         # Fallback analysis
         return {
@@ -156,24 +176,34 @@ class UnifiedKnowledgeFusionEngine:
         }
     
     def _create_fusion_prompt(self, query: str, core_analysis: Dict[str, Any]) -> str:
-        """Create enhanced prompt that fuses Core Backend analysis with AI synthesis"""
+        """Create enhanced prompt that fuses Core Backend search results with AI synthesis"""
         
-        # Extract key information from Core Backend
-        core_response = core_analysis.get("response", "")
+        # Extract search results from Core Backend
+        total_results = core_analysis.get("total_results", 0)
+        case_results = core_analysis.get("case_results", [])
+        code_results = core_analysis.get("code_results", [])
+        doc_results = core_analysis.get("doc_results", [])
         confidence = core_analysis.get("confidence", 0.0)
-        similar_cases = core_analysis.get("similar_cases", [])
-        technical_analysis = core_analysis.get("analysis", "")
+        search_metadata = core_analysis.get("search_metadata", {})
         
-        # Build comprehensive fusion prompt
-        fusion_prompt = f"""You are an expert IBM ASM (Agile Service Manager) consultant with access to advanced technical analysis.
+        # Build comprehensive fusion prompt with actual retrieved knowledge
+        fusion_prompt = f"""You are an expert IBM ASM (Agile Service Manager) consultant with access to retrieved knowledge from {total_results} relevant sources.
 
-TECHNICAL ANALYSIS FROM CORE SYSTEM:
-Core Response: {core_response}
-Confidence Level: {confidence}
-Technical Analysis: {technical_analysis}
+RETRIEVED KNOWLEDGE FROM CASE DATABASE:
+{self._format_case_results(case_results)}
 
-SIMILAR CASES FOUND:
-{self._format_similar_cases(similar_cases)}
+RETRIEVED CODE KNOWLEDGE:
+{self._format_code_results(code_results)}
+
+RETRIEVED DOCUMENTATION:
+{self._format_doc_results(doc_results)}
+
+SEARCH METADATA:
+- Total Results Found: {total_results}
+- Cases Found: {len(case_results)}
+- Code References: {len(code_results)}
+- Documentation: {len(doc_results)}
+- Search Confidence: {confidence:.2f}
 
 ASM DOMAIN EXPERTISE:
 Services: {', '.join(self.asm_expertise['services'].keys())}
@@ -183,27 +213,78 @@ Common Patterns: {', '.join(self.asm_expertise['common_patterns'])}
 USER QUERY: {query}
 
 TASK: Provide a comprehensive, intelligent response that:
-1. Synthesizes the technical analysis with your ASM expertise
-2. Addresses the user's specific question with actionable guidance
-3. Uses the similar cases to provide relevant context
-4. Explains complex concepts clearly
-5. Provides practical next steps
+1. Uses the RETRIEVED KNOWLEDGE to provide specific, relevant solutions
+2. References actual case numbers, code examples, and documentation when available
+3. Addresses the user's specific question with actionable guidance
+4. Explains complex concepts clearly with examples from the retrieved knowledge
+5. Provides practical next steps based on similar resolved cases
 
-Focus on being helpful, accurate, and ASM-specific. If the technical analysis has low confidence, rely more on your ASM expertise.
+Focus on being helpful, accurate, and ASM-specific. Use the retrieved knowledge as your primary source, supplemented by your ASM expertise.
 
 RESPONSE:"""
         
         return fusion_prompt
     
-    def _format_similar_cases(self, similar_cases: List[Dict]) -> str:
-        """Format similar cases for the prompt"""
-        if not similar_cases:
-            return "No similar cases found"
+    def _format_case_results(self, case_results: List[Dict]) -> str:
+        """Format case search results for the prompt"""
+        if not case_results:
+            return "No relevant cases found"
         
         formatted = []
-        for i, case in enumerate(similar_cases[:3], 1):
-            case_text = case.get('description', case.get('title', 'Case description'))
-            formatted.append(f"{i}. {case_text[:100]}...")
+        for i, case in enumerate(case_results[:5], 1):  # Top 5 cases
+            case_number = case.get('case_number', case.get('id', f'Case-{i}'))
+            title = case.get('title', 'Untitled Case')
+            description = case.get('description', case.get('full_text_for_rag', ''))[:200]
+            services = case.get('affected_services', case.get('services', []))
+            severity = case.get('severity', 'Unknown')
+            search_score = case.get('search_score', 0)
+            
+            formatted.append(f"""
+Case {i}: {case_number}
+Title: {title}
+Severity: {severity}
+Services: {', '.join(services[:3])}
+Description: {description}...
+Relevance Score: {search_score:.2f}
+""")
+        
+        return "\n".join(formatted)
+    
+    def _format_code_results(self, code_results: List[Dict]) -> str:
+        """Format code search results for the prompt"""
+        if not code_results:
+            return "No relevant code found"
+        
+        formatted = []
+        for i, code in enumerate(code_results[:3], 1):  # Top 3 code results
+            repo = code.get('repository', 'Unknown Repo')
+            file_path = code.get('file_path', 'Unknown File')
+            content = code.get('code_content', '')[:150]
+            
+            formatted.append(f"""
+Code {i}: {repo}/{file_path}
+Content: {content}...
+""")
+        
+        return "\n".join(formatted)
+    
+    def _format_doc_results(self, doc_results: List[Dict]) -> str:
+        """Format documentation search results for the prompt"""
+        if not doc_results:
+            return "No relevant documentation found"
+        
+        formatted = []
+        for i, doc in enumerate(doc_results[:3], 1):  # Top 3 docs
+            title = doc.get('title', 'Untitled Document')
+            doc_type = doc.get('doc_type', 'documentation')
+            content = doc.get('content', '')[:150]
+            source_url = doc.get('source_url', '')
+            
+            formatted.append(f"""
+Doc {i}: {title} ({doc_type})
+Content: {content}...
+Source: {source_url}
+""")
         
         return "\n".join(formatted)
     
