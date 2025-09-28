@@ -16,9 +16,12 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo "🔧 Starting Core Backend in Isolated Environment..."
+echo "🔧 Starting Core Backend in Isolated Environment with AI Support..."
 
-# Check if script is run from project root
+# Get project root
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Check if script is run from project root  
 if [ ! -f "knowledge_base.json" ]; then
     echo -e "${RED}❌ Error: Please run this script from the TOPOLOGYKNOWLEDGE project root${NC}"
     exit 1
@@ -38,10 +41,11 @@ if [ ! -d "$VENV_PATH" ]; then
         exit 1
     fi
     
-    echo "📦 Installing Core Backend dependencies..."
+    echo "📦 Installing Core Backend dependencies with AI support..."
     source "$VENV_PATH/bin/activate"
     pip install --upgrade pip
     pip install fastapi uvicorn python-multipart tiktoken requests
+    pip install sentence-transformers==2.2.2 numpy aiohttp pydantic
     
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✅ Isolated virtual environment created and configured${NC}"
@@ -81,22 +85,35 @@ fi
 # Navigate to backend directory
 cd "$BACKEND_PATH"
 
-# Check if lightweight main exists
-if [ ! -f "main_lite.py" ]; then
-    echo -e "${RED}❌ Error: main_lite.py not found in $BACKEND_PATH${NC}"
-    echo "Creating lightweight backend..."
+# Check if main.py exists (full AI version)
+if [ -f "main.py" ]; then
+    MAIN_FILE="main.py"
+    MODE="Full AI Mode"
+elif [ -f "main_enhanced.py" ]; then
+    MAIN_FILE="main_enhanced.py"
+    MODE="Enhanced AI Mode"  
+elif [ -f "main_lite.py" ]; then
+    MAIN_FILE="main_lite.py"
+    MODE="Lightweight Mode (No AI)"
+else
+    echo -e "${RED}❌ Error: No main backend file found in $BACKEND_PATH${NC}"
     exit 1
 fi
 
-# Start Core Backend in lightweight mode
-echo "🚀 Starting Core Backend (Lightweight Mode) on port $CORE_BACKEND_PORT..."
+# Set environment variables for AI integration
+export OLLAMA_BASE_URL="http://localhost:11434"
+export ENABLE_EMBEDDINGS="true" 
+export AI_MODEL_CONFIG="$PROJECT_ROOT/config/ai_models_config.json"
+
+# Start Core Backend with AI capabilities
+echo "🚀 Starting Core Backend ($MODE) on port $CORE_BACKEND_PORT..."
 echo "📁 Working directory: $(pwd)"
 echo "🐍 Python executable: $(which python)"
 echo "📝 Logs will be written to: $LOG_FILE"
-echo "🔧 Mode: Lightweight (No ML Dependencies)"
+echo "🔧 Mode: $MODE"
 
-# Run with proper logging
-python -m uvicorn main_lite:app \
+# Run with proper logging - use the best available main file
+python -m uvicorn ${MAIN_FILE%%.py}:app \
     --host 0.0.0.0 \
     --port $CORE_BACKEND_PORT \
     --reload \
