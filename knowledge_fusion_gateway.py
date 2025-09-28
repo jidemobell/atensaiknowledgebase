@@ -222,6 +222,17 @@ async def _should_use_multi_agent_processing(query: str, request: Dict[str, Any]
     if not MULTI_AGENT_ENABLED:
         return False
     
+    # Simple queries should always go to Core Backend
+    simple_queries = ['hello', 'hi', 'test', 'ping', 'status', 'help']
+    if query.lower().strip() in simple_queries:
+        print(f"🔄 Simple query detected: '{query}' -> routing to Core Backend")
+        return False
+    
+    # Very short queries (< 3 words) should use Core Backend
+    if len(query.split()) < 3:
+        print(f"🔄 Short query detected: '{query}' -> routing to Core Backend")  
+        return False
+    
     # Complexity indicators that benefit from multi-agent processing
     complexity_indicators = [
         # Multiple domain query
@@ -249,6 +260,7 @@ async def _should_use_multi_agent_processing(query: str, request: Dict[str, Any]
     
     # Use multi-agent if 2 or more complexity indicators are present
     complexity_score = sum(complexity_indicators)
+    print(f"🤖 Query complexity analysis: '{query}' -> score: {complexity_score}")
     return complexity_score >= 2
 
 @app.post("/knowledge-fusion/multi-agent")
