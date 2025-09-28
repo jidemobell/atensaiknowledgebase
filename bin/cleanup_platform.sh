@@ -1,4 +1,4 @@
-#!/bin/bash
+git #!/bin/bash
 
 # Knowledge Fusion Platform Cleanup Script
 # Removes outdated, redundant, and unwanted files
