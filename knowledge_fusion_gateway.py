@@ -363,7 +363,40 @@ async def knowledge_fusion_query(request: Dict[str, Any]):
         # ENHANCEMENT: Add intelligent case matching
         enhanced_request = await enhance_query_with_clustering(request, query)
         
-        # Try to route to actual Knowledge Fusion backend first
+        # For simple queries, prioritize Core Backend (AI-enabled)
+        simple_queries = ['hello', 'hi', 'test', 'ping', 'status', 'help']
+        is_simple_query = query.lower().strip() in simple_queries or len(query.split()) < 3
+        
+        if is_simple_query:
+            print(f"🎯 Simple query detected: '{query}' -> routing directly to AI-enabled Core Backend")
+            # Route directly to CoreBackend for simple queries
+            try:
+                async with httpx.AsyncClient() as client:
+                    print(f"📡 Routing to CoreBackend: {COREBACKEND_URL}")
+                    
+                    # Format request for CoreBackend (matches QueryRequest model)
+                    corebackend_request = {
+                        "query": query,
+                        "session_id": request.get("conversation_id", "default")
+                    }
+                    
+                    response = await client.post(
+                        f"{COREBACKEND_URL}/query",
+                        json=corebackend_request,
+                        timeout=10.0
+                    )
+                    
+                    if response.status_code == 200:
+                        core_result = response.json()
+                        print("✅ CoreBackend (AI) responded successfully")
+                        return core_result
+                    else:
+                        print(f"⚠️ CoreBackend returned {response.status_code}")
+                        
+            except Exception as core_error:
+                print(f"⚠️ CoreBackend error: {core_error}")
+        
+        # For complex queries, try Knowledge Fusion backend first
         try:
             async with httpx.AsyncClient() as client:
                 print(f"📡 Routing to Knowledge Fusion Backend: {KNOWLEDGE_FUSION_URL}")
@@ -383,7 +416,7 @@ async def knowledge_fusion_query(request: Dict[str, Any]):
         except Exception as kf_error:
             print(f"⚠️ Knowledge Fusion Backend error: {kf_error}")
         
-        # Try CoreBackend as fallback
+        # Try CoreBackend as final fallback
         try:
             async with httpx.AsyncClient() as client:
                 print(f"📡 Routing to CoreBackend: {COREBACKEND_URL}")

@@ -401,15 +401,15 @@ if ! wait_for_service "http://localhost:$CORE_BACKEND_PORT/health" "Core Backend
     exit 1
 fi
 
-echo -e "\n${BLUE}🔍 Step 2: Starting Knowledge Fusion Backend${NC}"
+echo -e "\n${BLUE}🔍 Step 2: Starting AI-Powered Knowledge Fusion Backend${NC}"
 
-start_service "Knowledge Fusion Backend" \
-    "python start_server.py" \
-    "$KNOWLEDGE_FUSION_TEMPLATE_PATH" \
+start_service "AI Knowledge Fusion Backend" \
+    "python ai_knowledge_fusion_backend.py" \
+    "$PROJECT_ROOT" \
     $KNOWLEDGE_FUSION_PORT
 
-if ! wait_for_service "http://localhost:$KNOWLEDGE_FUSION_PORT/health" "Knowledge Fusion Backend"; then
-    echo -e "${RED}❌ Knowledge Fusion Backend failed to start${NC}"
+if ! wait_for_service "http://localhost:$KNOWLEDGE_FUSION_PORT/health" "AI Knowledge Fusion Backend"; then
+    echo -e "${RED}❌ AI Knowledge Fusion Backend failed to start${NC}"
     cleanup
     exit 1
 fi

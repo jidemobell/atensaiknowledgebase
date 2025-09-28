@@ -142,8 +142,26 @@ if echo "$HEALTH_RESPONSE" | grep -q '"ml_components":"disabled"'; then
     sleep 5
 fi
 
+# Start AI Knowledge Fusion Backend
+echo -e "\n${BLUE}🚀 Step 5: Starting AI Knowledge Fusion Backend${NC}"
+cd "$PROJECT_ROOT"
+python3 ai_knowledge_fusion_backend.py &
+KNOWLEDGE_FUSION_PID=$!
+echo "knowledge_fusion $KNOWLEDGE_FUSION_PID" >> "$PID_FILE"
+
+# Wait for Knowledge Fusion Backend
+echo "⏳ Waiting for AI Knowledge Fusion Backend..."
+for i in {1..10}; do
+    if curl -s http://localhost:8002/health >/dev/null 2>&1; then
+        echo "✅ AI Knowledge Fusion Backend is ready"
+        break
+    fi
+    sleep 2
+    echo -n "."
+done
+
 # Start Knowledge Fusion Gateway
-echo -e "\n${BLUE}🚀 Step 5: Starting Knowledge Fusion Gateway${NC}"
+echo -e "\n${BLUE}🚀 Step 6: Starting Knowledge Fusion Gateway${NC}"
 cd "$PROJECT_ROOT"
 python3 knowledge_fusion_gateway.py &
 GATEWAY_PID=$!
